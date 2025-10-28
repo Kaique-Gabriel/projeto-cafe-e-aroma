@@ -12,24 +12,16 @@ import {
   Platform,
 } from 'react-native';
 
-/*
-  Versão "embelezada segura" do App.js
-  - Mantém todas as telas / fluxos que você já tem
-  - Adiciona: fundo com camada tipo gradient (simulado), botões com efeito, sombras, cards estilizados
-  - Usa apenas APIs nativas (Animated, TouchableOpacity, View, Text, Image)
-*/
-
 export default function App() {
-  // controla qual tela aparece
   const [screen, setScreen] = useState('home');
-  // campos de login
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
-  // animações globais (fade entre telas)
+  // estado para armazenar produto selecionado
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
   const fade = useRef(new Animated.Value(1)).current;
 
-  // função utilitária: anima fade out -> troca tela -> fade in
   const transitionTo = (nextScreen) => {
     Animated.timing(fade, {
       toValue: 0,
@@ -45,17 +37,14 @@ export default function App() {
     });
   };
 
-  // Botão custom com micro-animacao (scale)
   function AnimatedButton({ children, style, onPress, outline }) {
     const scale = useRef(new Animated.Value(1)).current;
-
     const onPressIn = () => {
       Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, friction: 6 }).start();
     };
     const onPressOut = () => {
       Animated.spring(scale, { toValue: 1, useNativeDriver: true, friction: 6 }).start();
     };
-
     return (
       <Animated.View style={{ transform: [{ scale }] }}>
         <TouchableOpacity
@@ -64,15 +53,12 @@ export default function App() {
           onPressIn={onPressIn}
           onPressOut={onPressOut}
           style={[styles.buttonBase, outline ? styles.buttonOutline : styles.buttonPrimary, style]}>
-          <Text style={[styles.buttonText, outline ? styles.buttonTextOutline : null]}>
-            {children}
-          </Text>
+          <Text style={[styles.buttonText, outline ? styles.buttonTextOutline : null]}>{children}</Text>
         </TouchableOpacity>
       </Animated.View>
     );
   }
 
-  // Card visual para produtos
   function ProductCard({ title, price, imageUri, onPress }) {
     return (
       <View style={styles.card}>
@@ -88,20 +74,16 @@ export default function App() {
     );
   }
 
-  // Renderiza as telas (mesmo fluxo funcional de antes)
   const renderScreen = () => {
     switch (screen) {
-      // tela inicial (bonita)
       case 'home':
         return (
           <Animated.View style={[styles.screenContainer, { opacity: fade }]}>
-            <View style={styles.gradientFakeTop} /> {/* camada para simular 'gradiente' */}
+            <View style={styles.gradientFakeTop} />
             <View style={styles.contentCenter}>
               <Text style={styles.brandMark}>☕</Text>
               <Text style={styles.title}>Café & Aroma</Text>
-
               <Image source={{ uri: 'https://i.imgur.com/yQpO2Ax.png' }} style={styles.heroImage} />
-
               <Text style={styles.lead}>Seu café da manhã em um toque — quentinho e rápido.</Text>
 
               <AnimatedButton style={{ marginTop: 18 }} onPress={() => transitionTo('login')}>
@@ -120,7 +102,6 @@ export default function App() {
           </Animated.View>
         );
 
-      // tela login
       case 'login':
         return (
           <Animated.View style={[styles.screenContainer, { opacity: fade }]}>
@@ -135,7 +116,6 @@ export default function App() {
                 onChangeText={setEmail}
                 keyboardType="email-address"
               />
-
               <TextInput
                 style={styles.input}
                 placeholder="Senha"
@@ -146,7 +126,6 @@ export default function App() {
               />
 
               <AnimatedButton onPress={() => transitionTo('homeApp')}>Entrar</AnimatedButton>
-
               <AnimatedButton outline style={{ marginTop: 10 }} onPress={() => transitionTo('home')}>
                 Voltar
               </AnimatedButton>
@@ -154,20 +133,17 @@ export default function App() {
           </Animated.View>
         );
 
-      // tela cadastro (simulada)
       case 'cadastro':
         return (
           <Animated.View style={[styles.screenContainer, { opacity: fade }]}>
             <View style={styles.formWrap}>
               <Text style={styles.title}>Criar conta</Text>
               <Text style={styles.text}>Ainda estamos finalizando o cadastro — por enquanto é simulado.</Text>
-
               <AnimatedButton onPress={() => transitionTo('home')}>Voltar</AnimatedButton>
             </View>
           </Animated.View>
         );
 
-      // tela principal após login
       case 'homeApp':
         return (
           <Animated.View style={[styles.screenContainer, { opacity: fade }]}>
@@ -179,25 +155,72 @@ export default function App() {
                 title="Café Expresso"
                 price="R$ 5,00"
                 imageUri="https://i.imgur.com/jHcP6aO.png"
-                onPress={() => alert('Pedir Café Expresso (simulado)')}
+                onPress={() => {
+                  setSelectedProduct({
+                    title: 'Café Expresso',
+                    price: 'R$ 5,00',
+                    image: 'https://i.imgur.com/jHcP6aO.png',
+                  });
+                  transitionTo('detalhesPedido');
+                }}
               />
 
               <ProductCard
                 title="Cappuccino"
                 price="R$ 7,00"
                 imageUri="https://i.imgur.com/FDyUuc8.png"
-                onPress={() => alert('Pedir Cappuccino (simulado)')}
+                onPress={() => {
+                  setSelectedProduct({
+                    title: 'Cappuccino',
+                    price: 'R$ 7,00',
+                    image: 'https://i.imgur.com/FDyUuc8.png',
+                  });
+                  transitionTo('detalhesPedido');
+                }}
               />
 
               <View style={styles.footerButtons}>
                 <AnimatedButton outline onPress={() => transitionTo('home')}>
                   Sair
                 </AnimatedButton>
-                <AnimatedButton onPress={() => alert('Tela De Pedidos (simulada)')}>
+                <AnimatedButton onPress={() => transitionTo('meusPedidos')}>
                   Meus Pedidos
                 </AnimatedButton>
               </View>
             </ScrollView>
+          </Animated.View>
+        );
+
+      case 'detalhesPedido':
+        return (
+          <Animated.View style={[styles.screenContainer, { opacity: fade, padding: 20, alignItems: 'center' }]}>
+            <Text style={styles.title}>Detalhes do Pedido</Text>
+            {selectedProduct && (
+              <>
+                <Image source={{ uri: selectedProduct.image }} style={{ width: 150, height: 150, borderRadius: 16, marginTop: 20 }} />
+                <Text style={styles.subtitle}>{selectedProduct.title}</Text>
+                <Text style={styles.cardPrice}>{selectedProduct.price}</Text>
+
+                <AnimatedButton style={{ marginTop: 20 }} onPress={() => alert('Pedido confirmado! (simulado)')}>
+                  Confirmar Pedido
+                </AnimatedButton>
+              </>
+            )}
+            <AnimatedButton outline style={{ marginTop: 16 }} onPress={() => transitionTo('homeApp')}>
+              Voltar
+            </AnimatedButton>
+          </Animated.View>
+        );
+
+      case 'meusPedidos':
+        return (
+          <Animated.View style={[styles.screenContainer, { opacity: fade, padding: 20 }]}>
+            <Text style={styles.title}>Meus Pedidos</Text>
+            <Text style={styles.subtitle}>Histórico de pedidos (simulado)</Text>
+            <Text style={styles.text}>Você ainda não fez pedidos reais.</Text>
+            <AnimatedButton style={{ marginTop: 20 }} onPress={() => transitionTo('homeApp')}>
+              Voltar
+            </AnimatedButton>
           </Animated.View>
         );
 
@@ -214,93 +237,18 @@ export default function App() {
   return <View style={styles.appMain}>{renderScreen()}</View>;
 }
 
-/* ============================
-   Styles (muitos comentários)
-   Mantém tudo organizado e "aumenta" o arquivo, sem remover funcionalidades.
-   ============================ */
 const styles = StyleSheet.create({
-  appMain: {
-    flex: 1,
-    backgroundColor: '#f7efe6', // base creme clara
-  },
-
-  // Screen container (padrão)
-  screenContainer: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-
-  // ===== fake gradient (camadas simples para aparência de gradiente)
-  gradientFakeTop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 120,
-    backgroundColor: 'rgba(139,69,19,0.06)', // marrom leve
-  },
-  gradientFakeBottom: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 140,
-    backgroundColor: 'rgba(139,69,19,0.03)',
-  },
-
-  // Centro do conteúdo
-  contentCenter: {
-    padding: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  // Marca (logo)
-  brandMark: {
-    fontSize: 42,
-    marginBottom: 6,
-    color: '#4b2e1e',
-  },
-
-  // Título principal
-  title: {
-    fontSize: 30,
-    fontWeight: '700',
-    color: '#4b2e1e',
-    textAlign: 'center',
-  },
-
-  // subtítulo / lead
-  lead: {
-    fontSize: 16,
-    color: '#6e4f36',
-    marginTop: 8,
-    marginBottom: 18,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 15,
-    color: '#6e4f36',
-    marginTop: 10,
-    marginBottom: 18,
-    textAlign: 'center',
-  },
-
-  // imagem hero
-  heroImage: {
-    width: 160,
-    height: 160,
-    borderRadius: 16,
-    marginVertical: 14,
-  },
-
-  // ===== formulário (login / cadastro)
-  formWrap: {
-    paddingHorizontal: 28,
-    alignItems: 'center',
-  },
-
-  // input simples
+  appMain: { flex: 1, backgroundColor: '#f7efe6' },
+  screenContainer: { flex: 1, justifyContent: 'center' },
+  gradientFakeTop: { position: 'absolute', top: 0, left: 0, right: 0, height: 120, backgroundColor: 'rgba(139,69,19,0.06)' },
+  gradientFakeBottom: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 140, backgroundColor: 'rgba(139,69,19,0.03)' },
+  contentCenter: { padding: 28, alignItems: 'center', justifyContent: 'center' },
+  brandMark: { fontSize: 42, marginBottom: 6, color: '#4b2e1e' },
+  title: { fontSize: 30, fontWeight: '700', color: '#4b2e1e', textAlign: 'center' },
+  lead: { fontSize: 16, color: '#6e4f36', marginTop: 8, marginBottom: 18, textAlign: 'center' },
+  subtitle: { fontSize: 18, color: '#6e4f36', marginTop: 10, marginBottom: 18, textAlign: 'center' },
+  heroImage: { width: 160, height: 160, borderRadius: 16, marginVertical: 14 },
+  formWrap: { paddingHorizontal: 28, alignItems: 'center' },
   input: {
     width: 320,
     maxWidth: '92%',
@@ -313,22 +261,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     color: '#33261a',
   },
-
-  // texto explicativo
-  text: {
-    color: '#4b2e1e',
-    fontSize: 15,
-    marginBottom: 10,
-  },
-
-  // ===== botões (base + variantes)
-  buttonBase: {
-    minWidth: 160,
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 28,
-    alignItems: 'center',
-  },
+  text: { color: '#4b2e1e', fontSize: 15, marginBottom: 10 },
+  buttonBase: { minWidth: 160, paddingVertical: 12, paddingHorizontal: 18, borderRadius: 28, alignItems: 'center' },
   buttonPrimary: {
     backgroundColor: '#7b4f33',
     shadowColor: '#000',
@@ -337,29 +271,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
   },
-  buttonOutline: {
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: '#7b4f33',
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: '700',
-  },
-  buttonTextOutline: {
-    color: '#7b4f33',
-  },
-
-  // nota pequena abaixo dos botões
-  smallNoteWrap: {
-    marginTop: 14,
-  },
-  smallNote: {
-    color: '#8b6f51',
-    fontSize: 12,
-  },
-
-  // ===== cards de produto
+  buttonOutline: { backgroundColor: 'transparent', borderWidth: 2, borderColor: '#7b4f33' },
+  buttonText: { color: '#fff', fontWeight: '700' },
+  buttonTextOutline: { color: '#7b4f33' },
+  smallNoteWrap: { marginTop: 14 },
+  smallNote: { color: '#8b6f51', fontSize: 12 },
   card: {
     backgroundColor: '#fff',
     width: 340,
@@ -376,38 +292,10 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 4,
   },
-  cardImage: {
-    width: 92,
-    height: 92,
-    borderRadius: 10,
-    marginRight: 12,
-  },
-  cardBody: {
-    flex: 1,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#342217',
-  },
-  cardPrice: {
-    color: '#8b6f51',
-    marginTop: 4,
-    fontSize: 14,
-  },
-
-  // layout do scroll na homeApp
-  scrollContent: {
-    alignItems: 'center',
-    paddingVertical: 30,
-    paddingHorizontal: 16,
-  },
-
-  // rodapé com 2 botões
-  footerButtons: {
-    marginTop: 18,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '86%',
-  },
+  cardImage: { width: 92, height: 92, borderRadius: 10, marginRight: 12 },
+  cardBody: { flex: 1 },
+  cardTitle: { fontSize: 16, fontWeight: '700', color: '#342217' },
+  cardPrice: { color: '#8b6f51', marginTop: 4, fontSize: 14 },
+  scrollContent: { alignItems: 'center', paddingVertical: 30, paddingHorizontal: 16 },
+  footerButtons: { marginTop: 18, flexDirection: 'row', justifyContent: 'space-between', width: '86%' },
 });
