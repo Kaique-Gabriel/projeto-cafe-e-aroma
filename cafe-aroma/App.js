@@ -1,4 +1,5 @@
 // App.js
+import HomeApp from './src/screens/HomeApp';
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
@@ -145,51 +146,20 @@ export default function App() {
         );
 
       case 'homeApp':
-        return (
-          <Animated.View style={[styles.screenContainer, { opacity: fade }]}>
-            <ScrollView contentContainerStyle={styles.scrollContent}>
-              <Text style={styles.title}>Bem-vindo!</Text>
-              <Text style={styles.lead}>Escolha seu pedido abaixo</Text>
-
-              <ProductCard
-                title="Café Expresso"
-                price="R$ 5,00"
-                imageUri="https://i.imgur.com/jHcP6aO.png"
-                onPress={() => {
-                  setSelectedProduct({
-                    title: 'Café Expresso',
-                    price: 'R$ 5,00',
-                    image: 'https://i.imgur.com/jHcP6aO.png',
-                  });
-                  transitionTo('detalhesPedido');
-                }}
-              />
-
-              <ProductCard
-                title="Cappuccino"
-                price="R$ 7,00"
-                imageUri="https://i.imgur.com/FDyUuc8.png"
-                onPress={() => {
-                  setSelectedProduct({
-                    title: 'Cappuccino',
-                    price: 'R$ 7,00',
-                    image: 'https://i.imgur.com/FDyUuc8.png',
-                  });
-                  transitionTo('detalhesPedido');
-                }}
-              />
-
-              <View style={styles.footerButtons}>
-                <AnimatedButton outline onPress={() => transitionTo('home')}>
-                  Sair
-                </AnimatedButton>
-                <AnimatedButton onPress={() => transitionTo('meusPedidos')}>
-                  Meus Pedidos
-                </AnimatedButton>
-              </View>
-            </ScrollView>
-          </Animated.View>
-        );
+  return (
+    <HomeApp
+      onNavigate={(target, data = null) => {
+        // se for detalhes do pedido, grava o produto selecionado e faz a transição (mantendo sua animação)
+        if (target === 'detalhesPedido') {
+          setSelectedProduct(data);
+          transitionTo('detalhesPedido');
+          return;
+        }
+        // caso normal: só transita para a tela desejada
+        transitionTo(target);
+      }}
+    />
+  );
 
       case 'detalhesPedido':
         return (

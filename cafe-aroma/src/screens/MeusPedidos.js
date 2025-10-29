@@ -1,27 +1,19 @@
-// src/screens/Pedidos.js
+// src/screens/MeusPedidos.js
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
-export default function Pedidos({ onNavigate }) {
+export default function MeusPedidos({ onNavigate }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Detalhes do Pedido ☕</Text>
-      <Text style={styles.subtitle}>
-        Aqui você verá o resumo e confirmação do seu pedido.
-      </Text>
+      <Text style={styles.title}>Meus Pedidos</Text>
+      <Text style={styles.subtitle}>Histórico dos seus pedidos ☕</Text>
+      <Text style={styles.text}>Você ainda não fez nenhum pedido real.</Text>
 
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: '#7b4f33' }]}
-        onPress={() => onNavigate('meusPedidos')}
-      >
-        <Text style={styles.buttonText}>Ver Meus Pedidos</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[styles.button, styles.outlineButton]}
+        style={[styles.button, styles.primary]}
         onPress={() => onNavigate('homeApp')}
       >
-        <Text style={[styles.buttonText, { color: '#7b4f33' }]}>Voltar</Text>
+        <Text style={styles.buttonText}>Voltar para o início</Text>
       </TouchableOpacity>
     </View>
   );
@@ -42,10 +34,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   subtitle: {
-    fontSize: 15,
+    fontSize: 16,
     color: '#6e4f36',
-    marginBottom: 25,
+    marginBottom: 6,
     textAlign: 'center',
+  },
+  text: {
+    color: '#8b6f51',
+    textAlign: 'center',
+    marginBottom: 20,
   },
   button: {
     paddingVertical: 12,
@@ -53,10 +50,8 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginVertical: 8,
   },
-  outlineButton: {
-    borderWidth: 2,
-    borderColor: '#7b4f33',
-    backgroundColor: 'transparent',
+  primary: {
+    backgroundColor: '#7b4f33',
   },
   buttonText: {
     fontWeight: '700',
