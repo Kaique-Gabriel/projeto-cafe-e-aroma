@@ -13,28 +13,36 @@ import {
 const { width } = Dimensions.get('window');
 
 export default function HomeApp({ onNavigate }) {
+  // 🔹 Drawer aprimorado
+  const drawerWidth = Math.min(width * 0.6, 280);
   const [menuVisible, setMenuVisible] = useState(false);
-  const slideAnim = useRef(new Animated.Value(-width * 0.7)).current;
+  const slideAnim = useRef(new Animated.Value(-drawerWidth)).current;
 
-  const toggleMenu = () => {
+  const openMenu = () => {
+    setMenuVisible(true);
     Animated.timing(slideAnim, {
-      toValue: menuVisible ? -width * 0.7 : 0,
-      duration: 300,
+      toValue: 0,
+      duration: 280,
       useNativeDriver: true,
     }).start();
-    setMenuVisible(!menuVisible);
   };
 
-  // Ao navegar, fechamos o menu (se aberto) e chamamos a função onNavigate recebida do App.js.
+  const closeMenu = () => {
+    Animated.timing(slideAnim, {
+      toValue: -drawerWidth,
+      duration: 250,
+      useNativeDriver: true,
+    }).start(() => setMenuVisible(false));
+  };
+
+  const toggleMenu = () => {
+    if (menuVisible) closeMenu();
+    else openMenu();
+  };
+
+  // 🔹 Fechar menu ao navegar
   const handleNavigate = (target, data = null) => {
-    if (menuVisible) {
-      Animated.timing(slideAnim, {
-        toValue: -width * 0.7,
-        duration: 220,
-        useNativeDriver: true,
-      }).start(() => setMenuVisible(false));
-    }
-    // small delay so closing animation feels natural
+    if (menuVisible) closeMenu();
     setTimeout(() => onNavigate(target, data), 240);
   };
 
@@ -61,11 +69,23 @@ export default function HomeApp({ onNavigate }) {
 
   return (
     <View style={styles.main}>
+      {/* 🔹 Overlay (fecha o menu ao tocar fora) */}
+      {menuVisible && (
+        <TouchableOpacity
+          style={styles.overlay}
+          activeOpacity={1}
+          onPress={closeMenu}
+        />
+      )}
+
       {/* 🔹 Menu Lateral */}
       <Animated.View
         style={[
           styles.menuContainer,
-          { transform: [{ translateX: slideAnim }] },
+          { width: drawerWidth,
+            transform: [{ translateX: slideAnim }],
+        shadowOpacity: menuVisible? 0.25 : 0,
+      shadowRadius: 8 },
         ]}>
         <Text style={styles.menuTitle}>☕ Menu</Text>
 
@@ -73,7 +93,7 @@ export default function HomeApp({ onNavigate }) {
           <Text style={styles.menuItem}>📦 Meus pedidos</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => handleNavigate('perfil')}>
+        <TouchableOpacity onPress={() => onNavigate('perfil')}>
           <Text style={styles.menuItem}>👤 Meu perfil</Text>
         </TouchableOpacity>
 
@@ -104,12 +124,13 @@ export default function HomeApp({ onNavigate }) {
 
               <TouchableOpacity
                 style={styles.smallButton}
-                onPress={() => handleNavigate('detalhesPedido', {
-                  title: item.name,
-                  price: item.price,
-                  image: item.img,
-                })}
-              >
+                onPress={() =>
+                  handleNavigate('detalhesPedido', {
+                    title: item.name,
+                    price: item.price,
+                    image: item.img,
+                  })
+                }>
                 <Text style={styles.smallButtonText}>Pedir</Text>
               </TouchableOpacity>
             </View>
@@ -197,8 +218,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     top: 0,
-    width: width * 0.7,
     height: '100%',
+    width: '68%',
     backgroundColor: '#fff',
     paddingTop: 50,
     paddingHorizontal: 20,
@@ -206,6 +227,10 @@ const styles = StyleSheet.create({
     zIndex: 10,
     borderRightWidth: 2,
     borderColor: '#f0e6da',
+    shadowColor: '#000',
+    shadowOffset: {width: 2, height: 4},
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
   },
   menuTitle: {
     fontSize: 22,
@@ -217,5 +242,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#4b2e1e',
     marginVertical: 10,
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+    zIndex: 5,
   },
 });

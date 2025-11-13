@@ -1,4 +1,5 @@
 // App.js
+import Perfil from './src/screens/Perfil';
 import HomeApp from './src/screens/HomeApp';
 import React, { useState, useRef, useEffect } from 'react';
 import {
@@ -17,6 +18,8 @@ export default function App() {
   const [screen, setScreen] = useState('home');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [telaAtual, setTelaAtual] = useState('homeApp');
+
 
   // estado para armazenar produto selecionado
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -161,6 +164,8 @@ export default function App() {
     />
   );
 
+  case 'perfil':
+  return <Perfil onVoltar={() => transitionTo('homeApp')} />;
       case 'detalhesPedido':
         return (
           <Animated.View style={[styles.screenContainer, { opacity: fade, padding: 20, alignItems: 'center' }]}>
