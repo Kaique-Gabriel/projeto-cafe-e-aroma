@@ -1,10 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
+  ScrollView,
   StyleSheet,
   Image,
-  ScrollView,
   TouchableOpacity,
   Animated,
   Dimensions,
@@ -13,243 +13,220 @@ import {
 const { width } = Dimensions.get('window');
 
 export default function HomeApp({ onNavigate }) {
-  // 🔹 Drawer aprimorado
-  const drawerWidth = Math.min(width * 0.6, 280);
-  const [menuVisible, setMenuVisible] = useState(false);
-  const slideAnim = useRef(new Animated.Value(-drawerWidth)).current;
+  const [promos] = useState([
+    { id: 'p1', title: 'Café da Manhã Especial', img: 'https://i.imgur.com/dcA8X3j.jpg' },
+    { id: 'p2', title: 'Combo Croissant + Café', img: 'https://i.imgur.com/yQpO2Ax.png' },
+    { id: 'p3', title: 'Descontos do Dia ☕', img: 'https://i.imgur.com/xH4M8bA.jpg' },
+  ]);
 
-  const openMenu = () => {
-    setMenuVisible(true);
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration: 280,
+  const [products] = useState([
+    {
+      id: '1',
+      name: 'Cappuccino Tradicional',
+      price: 'R$ 8,90',
+      img: 'https://i.imgur.com/k9oZB8Y.jpg',
+    },
+    {
+      id: '2',
+      name: 'Croissant de Chocolate',
+      price: 'R$ 7,50',
+      img: 'https://i.imgur.com/7yU1nSR.jpg',
+    },
+    {
+      id: '3',
+      name: 'Pão de Queijo Gourmet',
+      price: 'R$ 5,90',
+      img: 'https://i.imgur.com/sHdYFvL.jpg',
+    },
+    {
+      id: '4',
+      name: 'Café Gelado Vanilla',
+      price: 'R$ 9,90',
+      img: 'https://i.imgur.com/t1Bf87S.jpg',
+    },
+  ]);
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
       useNativeDriver: true,
     }).start();
-  };
-
-  const closeMenu = () => {
-    Animated.timing(slideAnim, {
-      toValue: -drawerWidth,
-      duration: 250,
-      useNativeDriver: true,
-    }).start(() => setMenuVisible(false));
-  };
-
-  const toggleMenu = () => {
-    if (menuVisible) closeMenu();
-    else openMenu();
-  };
-
-  // 🔹 Fechar menu ao navegar
-  const handleNavigate = (target, data = null) => {
-    if (menuVisible) closeMenu();
-    setTimeout(() => onNavigate(target, data), 240);
-  };
-
-  const cards = [
-    {
-      name: 'Café Expresso',
-      desc: 'Encorpado, forte e autêntico.',
-      img: 'https://i.imgur.com/jHcP6aO.png',
-      price: 'R$ 5,00',
-    },
-    {
-      name: 'Cappuccino',
-      desc: 'Café, leite e espuma cremosa.',
-      img: 'https://i.imgur.com/FDyUuc8.png',
-      price: 'R$ 7,00',
-    },
-    {
-      name: 'Latte',
-      desc: 'Suave, aveludado e levemente doce.',
-      img: 'https://i.imgur.com/0N1eTgK.png',
-      price: 'R$ 6,50',
-    },
-  ];
+  }, []);
 
   return (
-    <View style={styles.main}>
-      {/* 🔹 Overlay (fecha o menu ao tocar fora) */}
-      {menuVisible && (
-        <TouchableOpacity
-          style={styles.overlay}
-          activeOpacity={1}
-          onPress={closeMenu}
-        />
-      )}
-
-      {/* 🔹 Menu Lateral */}
-      <Animated.View
-        style={[
-          styles.menuContainer,
-          { width: drawerWidth,
-            transform: [{ translateX: slideAnim }],
-        shadowOpacity: menuVisible? 0.25 : 0,
-      shadowRadius: 8 },
-        ]}>
-        <Text style={styles.menuTitle}>☕ Menu</Text>
-
-        <TouchableOpacity onPress={() => handleNavigate('meusPedidos')}>
-          <Text style={styles.menuItem}>📦 Meus pedidos</Text>
-        </TouchableOpacity>
-
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+      {/* Cabeçalho */}
+      <View style={styles.header}>
+        <Text style={styles.logo}>Café & Aroma</Text>
         <TouchableOpacity onPress={() => onNavigate('perfil')}>
-          <Text style={styles.menuItem}>👤 Meu perfil</Text>
+          <Image
+            source={{ uri: 'https://i.imgur.com/Jf0X8gu.png' }}
+            style={styles.avatar}
+          />
         </TouchableOpacity>
+      </View>
 
-        <TouchableOpacity onPress={() => handleNavigate('home')}>
-          <Text style={[styles.menuItem, { color: '#a33' }]}>🚪 Sair</Text>
-        </TouchableOpacity>
-      </Animated.View>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Carrossel */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          pagingEnabled
+          style={styles.carousel}
+        >
+          {promos.map((promo) => (
+            <View key={promo.id} style={styles.promoCard}>
+              <Image source={{ uri: promo.img }} style={styles.promoImage} />
+              <View style={styles.promoOverlay}>
+                <Text style={styles.promoText}>{promo.title}</Text>
+              </View>
+            </View>
+          ))}
+        </ScrollView>
 
-      {/* 🔹 Conteúdo principal */}
-      <ScrollView style={styles.content}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={toggleMenu}>
-            <Text style={styles.menuButton}>☰</Text>
-          </TouchableOpacity>
-
-          <View>
-            <Text style={styles.titleHome}>Bem-vindo, amante de café!</Text>
-            <Text style={styles.subtitleHome}>Descubra seu sabor favorito ☕</Text>
+        {/* Seção de Produtos */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>☕ Nossos Produtos</Text>
+          <View style={styles.productGrid}>
+            {products.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.card}
+                activeOpacity={0.8}
+                onPress={() => onNavigate('detalhesPedido', item)}
+              >
+                <Image source={{ uri: item.img }} style={styles.cardImage} />
+                <View style={styles.cardInfo}>
+                  <Text style={styles.cardTitle}>{item.name}</Text>
+                  <Text style={styles.cardPrice}>{item.price}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
 
-        <View style={styles.cardsContainer}>
-          {cards.map((item, index) => (
-            <View key={index} style={styles.card}>
-              <Image source={{ uri: item.img }} style={styles.cardImage} />
-              <Text style={styles.cardTitle}>{item.name}</Text>
-              <Text style={styles.cardText}>{item.desc}</Text>
-
-              <TouchableOpacity
-                style={styles.smallButton}
-                onPress={() =>
-                  handleNavigate('detalhesPedido', {
-                    title: item.name,
-                    price: item.price,
-                    image: item.img,
-                  })
-                }>
-                <Text style={styles.smallButtonText}>Pedir</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
+        {/* Botão "Meus Pedidos" */}
+        <TouchableOpacity
+          style={styles.meusPedidosBtn}
+          onPress={() => onNavigate('meusPedidos')}
+        >
+          <Text style={styles.meusPedidosText}>Ver Meus Pedidos</Text>
+        </TouchableOpacity>
       </ScrollView>
-    </View>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  main: {
+  container: {
     flex: 1,
-    backgroundColor: '#fdf5ee',
-  },
-  content: {
-    flex: 1,
+    backgroundColor: '#1f130b',
+    paddingTop: 50,
   },
   header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 15,
-    justifyContent: 'flex-start',
+    paddingBottom: 10,
   },
-  menuButton: {
-    fontSize: 28,
-    color: '#4b2e1e',
-    marginRight: 15,
-  },
-  titleHome: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#4b2e1e',
-  },
-  subtitleHome: {
-    fontSize: 14,
-    color: '#7b4f33',
-    marginTop: 3,
-  },
-  cardsContainer: {
-    alignItems: 'center',
-    paddingBottom: 30,
-  },
-  card: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 14,
-    marginVertical: 10,
-    alignItems: 'center',
-    width: '90%',
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  cardImage: {
-    width: 140,
-    height: 140,
-    marginBottom: 10,
-    borderRadius: 10,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#4b2e1e',
-  },
-  cardText: {
-    fontSize: 14,
-    color: '#7b4f33',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  smallButton: {
-    backgroundColor: '#7b4f33',
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
-  smallButtonText: {
-    color: '#fff',
+  logo: {
+    fontSize: 24,
+    color: '#f5f5f5',
     fontWeight: 'bold',
   },
-  menuContainer: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
+  avatar: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    borderWidth: 2,
+    borderColor: '#a37b5a',
+  },
+
+  // Carrossel
+  carousel: {
+    marginTop: 10,
+  },
+  promoCard: {
+    width: width * 0.88,
+    height: 170,
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginHorizontal: 10,
+    backgroundColor: '#2b1b12',
+  },
+  promoImage: {
+    width: '100%',
     height: '100%',
-    width: '68%',
-    backgroundColor: '#fff',
-    paddingTop: 50,
-    paddingHorizontal: 20,
-    elevation: 10,
-    zIndex: 10,
-    borderRightWidth: 2,
-    borderColor: '#f0e6da',
-    shadowColor: '#000',
-    shadowOffset: {width: 2, height: 4},
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
   },
-  menuTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#4b2e1e',
-    marginBottom: 30,
-  },
-  menuItem: {
-    fontSize: 18,
-    color: '#4b2e1e',
-    marginVertical: 10,
-  },
-  overlay: {
+  promoOverlay: {
     position: 'absolute',
-    top: 0,
+    bottom: 0,
     left: 0,
     right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.25)',
-    zIndex: 5,
+    padding: 10,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+  },
+  promoText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  // Produtos
+  section: {
+    paddingHorizontal: 20,
+    marginTop: 25,
+  },
+  sectionTitle: {
+    color: '#f5f5f5',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  productGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  card: {
+    backgroundColor: '#2b1b12',
+    borderRadius: 14,
+    width: '48%',
+    marginBottom: 14,
+    overflow: 'hidden',
+  },
+  cardImage: {
+    width: '100%',
+    height: 120,
+  },
+  cardInfo: {
+    padding: 8,
+  },
+  cardTitle: {
+    color: '#f5f5f5',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  cardPrice: {
+    color: '#d4c6be',
+    marginTop: 4,
+  },
+
+  // Meus Pedidos
+  meusPedidosBtn: {
+    backgroundColor: '#5d4037',
+    borderRadius: 25,
+    marginHorizontal: 60,
+    marginVertical: 30,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  meusPedidosText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });

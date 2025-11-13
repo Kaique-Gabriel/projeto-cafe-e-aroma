@@ -1,8 +1,5 @@
 // App.js
-import Perfil from './src/screens/Perfil';
-import HomeApp from './src/screens/HomeApp';
 import React, { useState, useRef, useEffect } from 'react';
-import { Animated, Easing } from 'react-native';
 import {
   View,
   Text,
@@ -11,24 +8,28 @@ import {
   StyleSheet,
   Image,
   ScrollView,
+  Animated,
   Platform,
 } from 'react-native';
 
+// telas externas (coloque os arquivos em src/screens/)
+import HomeApp from './src/screens/HomeApp';
+import Perfil from './src/screens/Perfil';
+
 export default function App() {
-  const [screen, setScreen] = useState('home');
+  // controle de telas principais
+  const [screen, setScreen] = useState('home'); // 'home' (welcome) | 'login' | 'cadastro' | 'homeApp' | 'perfil' | 'detalhesPedido' | 'meusPedidos'
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [telaAtual, setTelaAtual] = useState('homeApp');
 
-  // estado para armazenar produto selecionado
+  // produto selecionado (para detalhes do pedido)
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // fade padrão já existente
-  const fade = useRef(new Animated.Value(1)).current;
+  // fades
+  const fade = useRef(new Animated.Value(1)).current; // usado em transitionTo
+  const fadeTela = useRef(new Animated.Value(1)).current; // fade global entre telas (mais lento)
 
-  // 🎯 Novo: fade para transição suave entre telas internas
-  const fadeTela = useRef(new Animated.Value(0)).current;
-
+  // quando a screen mudar, faz um fade-in (suaviza mudanças)
   useEffect(() => {
     fadeTela.setValue(0);
     Animated.timing(fadeTela, {
@@ -38,10 +39,11 @@ export default function App() {
     }).start();
   }, [screen]);
 
+  // transição padrão (usada por botões tipo "entrar", "voltar", etc)
   const transitionTo = (nextScreen) => {
     Animated.timing(fade, {
       toValue: 0,
-      duration: 160,
+      duration: 140,
       useNativeDriver: true,
     }).start(() => {
       setScreen(nextScreen);
@@ -53,6 +55,7 @@ export default function App() {
     });
   };
 
+  // componente de botão animado (micro-feedback)
   function AnimatedButton({ children, style, onPress, outline }) {
     const scale = useRef(new Animated.Value(1)).current;
     const onPressIn = () => {
@@ -75,23 +78,10 @@ export default function App() {
     );
   }
 
-  function ProductCard({ title, price, imageUri, onPress }) {
-    return (
-      <View style={styles.card}>
-        <Image source={{ uri: imageUri }} style={styles.cardImage} />
-        <View style={styles.cardBody}>
-          <Text style={styles.cardTitle}>{title}</Text>
-          <Text style={styles.cardPrice}>{price}</Text>
-          <AnimatedButton style={{ marginTop: 10 }} onPress={onPress}>
-            Pedir
-          </AnimatedButton>
-        </View>
-      </View>
-    );
-  }
-
+  // ---- Render das telas ----
   const renderScreen = () => {
     switch (screen) {
+      // === TELA INICIAL (welcome) ===
       case 'home':
         return (
           <Animated.View style={[styles.screenContainer, { opacity: fade }]}>
@@ -118,6 +108,7 @@ export default function App() {
           </Animated.View>
         );
 
+      // === LOGIN ===
       case 'login':
         return (
           <Animated.View style={[styles.screenContainer, { opacity: fade }]}>
@@ -149,6 +140,7 @@ export default function App() {
           </Animated.View>
         );
 
+      // === CADASTRO SIMULADO ===
       case 'cadastro':
         return (
           <Animated.View style={[styles.screenContainer, { opacity: fade }]}>
@@ -160,47 +152,54 @@ export default function App() {
           </Animated.View>
         );
 
+      // === HOMEAPP (IMPORTADO) ===
       case 'homeApp':
         return (
           <HomeApp
             onNavigate={(target, data = null) => {
+              // se for detalhe: guardamos produto e mudamos de tela
               if (target === 'detalhesPedido') {
                 setSelectedProduct(data);
                 transitionTo('detalhesPedido');
                 return;
               }
+              // caso comum: navega normalmente (perfil, meusPedidos, etc)
               transitionTo(target);
             }}
           />
         );
 
+      // === PERFIL (IMPORTADO) ===
       case 'perfil':
+        // Perfil.js deve receber onVoltar prop (ou você pode fazer setScreen direto)
         return <Perfil onVoltar={() => transitionTo('homeApp')} />;
 
+      // === DETALHES DO PEDIDO ===
       case 'detalhesPedido':
         return (
           <Animated.View style={[styles.screenContainer, { opacity: fade, padding: 20, alignItems: 'center' }]}>
             <Text style={styles.title}>Detalhes do Pedido</Text>
-            {selectedProduct && (
+            {selectedProduct ? (
               <>
-                <Image
-                  source={{ uri: selectedProduct.image }}
-                  style={{ width: 150, height: 150, borderRadius: 16, marginTop: 20 }}
-                />
-                <Text style={styles.subtitle}>{selectedProduct.title}</Text>
-                <Text style={styles.cardPrice}>{selectedProduct.price}</Text>
+                <Image source={{ uri: selectedProduct.image || selectedProduct.img || selectedProduct.uri }} style={{ width: 150, height: 150, borderRadius: 16, marginTop: 20 }} />
+                <Text style={styles.subtitle}>{selectedProduct.title || selectedProduct.name}</Text>
+                <Text style={styles.cardPrice}>{selectedProduct.price || '—'}</Text>
 
                 <AnimatedButton style={{ marginTop: 20 }} onPress={() => alert('Pedido confirmado! (simulado)')}>
                   Confirmar Pedido
                 </AnimatedButton>
               </>
+            ) : (
+              <Text style={styles.text}>Nenhum produto selecionado.</Text>
             )}
+
             <AnimatedButton outline style={{ marginTop: 16 }} onPress={() => transitionTo('homeApp')}>
               Voltar
             </AnimatedButton>
           </Animated.View>
         );
 
+      // === MEUS PEDIDOS ===
       case 'meusPedidos':
         return (
           <Animated.View style={[styles.screenContainer, { opacity: fade, padding: 20 }]}>
@@ -213,6 +212,7 @@ export default function App() {
           </Animated.View>
         );
 
+      // === DEFAULT / Fallback ===
       default:
         return (
           <Animated.View style={[styles.screenContainer, { opacity: fade }]}>
@@ -223,7 +223,7 @@ export default function App() {
     }
   };
 
-  // 🎯 Aqui aplicamos o fadeTela global
+  // <-- Render final com fadeTela aplicado -->
   return (
     <Animated.View style={[styles.appMain, { opacity: fadeTela }]}>
       {renderScreen()}
@@ -231,47 +231,63 @@ export default function App() {
   );
 }
 
+/* ===========================
+   Styles
+   =========================== */
 const styles = StyleSheet.create({
-  appMain: { flex: 1, backgroundColor: '#f7efe6' },
+  appMain: { flex: 1, backgroundColor: '#1f130b' }, // base escura elegante
   screenContainer: { flex: 1, justifyContent: 'center' },
-  gradientFakeTop: { position: 'absolute', top: 0, left: 0, right: 0, height: 120, backgroundColor: 'rgba(139,69,19,0.06)' },
-  gradientFakeBottom: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 140, backgroundColor: 'rgba(139,69,19,0.03)' },
+
+  // fake gradients
+  gradientFakeTop: { position: 'absolute', top: 0, left: 0, right: 0, height: 120, backgroundColor: 'rgba(255,255,255,0.02)' },
+  gradientFakeBottom: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 140, backgroundColor: 'rgba(255,255,255,0.01)' },
+
   contentCenter: { padding: 28, alignItems: 'center', justifyContent: 'center' },
-  brandMark: { fontSize: 42, marginBottom: 6, color: '#4b2e1e' },
-  title: { fontSize: 30, fontWeight: '700', color: '#4b2e1e', textAlign: 'center' },
-  lead: { fontSize: 16, color: '#6e4f36', marginTop: 8, marginBottom: 18, textAlign: 'center' },
-  subtitle: { fontSize: 18, color: '#6e4f36', marginTop: 10, marginBottom: 18, textAlign: 'center' },
+
+  // brand
+  brandMark: { fontSize: 42, marginBottom: 6, color: '#f5f5f5' },
+  title: { fontSize: 30, fontWeight: '700', color: '#f5f5f5', textAlign: 'center' },
+  lead: { fontSize: 16, color: '#d4c6be', marginTop: 8, marginBottom: 18, textAlign: 'center' },
+
   heroImage: { width: 160, height: 160, borderRadius: 16, marginVertical: 14 },
+
+  // forms
   formWrap: { paddingHorizontal: 28, alignItems: 'center' },
   input: {
     width: 320,
     maxWidth: '92%',
     paddingHorizontal: 14,
     paddingVertical: Platform.OS === 'web' ? 10 : 12,
-    backgroundColor: '#fff',
+    backgroundColor: '#2b1b12',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#e0cbb6',
+    borderColor: '#3a2618',
     marginBottom: 12,
-    color: '#33261a',
+    color: '#f5f5f5',
   },
-  text: { color: '#4b2e1e', fontSize: 15, marginBottom: 10 },
+
+  text: { color: '#d4c6be', fontSize: 15, marginBottom: 10 },
+
+  // buttons
   buttonBase: { minWidth: 160, paddingVertical: 12, paddingHorizontal: 18, borderRadius: 28, alignItems: 'center' },
   buttonPrimary: {
-    backgroundColor: '#7b4f33',
+    backgroundColor: '#5d4037',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.18,
-    shadowRadius: 4,
+    shadowOpacity: 0.22,
+    shadowRadius: 6,
     elevation: 4,
   },
-  buttonOutline: { backgroundColor: 'transparent', borderWidth: 2, borderColor: '#7b4f33' },
+  buttonOutline: { backgroundColor: 'transparent', borderWidth: 2, borderColor: '#5d4037' },
   buttonText: { color: '#fff', fontWeight: '700' },
-  buttonTextOutline: { color: '#7b4f33' },
+  buttonTextOutline: { color: '#e6d7cf' },
+
   smallNoteWrap: { marginTop: 14 },
-  smallNote: { color: '#8b6f51', fontSize: 12 },
+  smallNote: { color: '#b79d90', fontSize: 12 },
+
+  // product card (fallback style used in detalhes)
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: '#2b1b12',
     width: 340,
     maxWidth: '94%',
     marginVertical: 10,
@@ -280,16 +296,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 4,
   },
   cardImage: { width: 92, height: 92, borderRadius: 10, marginRight: 12 },
   cardBody: { flex: 1 },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: '#342217' },
-  cardPrice: { color: '#8b6f51', marginTop: 4, fontSize: 14 },
+  cardTitle: { fontSize: 16, fontWeight: '700', color: '#f5f5f5' },
+  cardPrice: { color: '#d4c6be', marginTop: 4, fontSize: 14 },
+
   scrollContent: { alignItems: 'center', paddingVertical: 30, paddingHorizontal: 16 },
   footerButtons: { marginTop: 18, flexDirection: 'row', justifyContent: 'space-between', width: '86%' },
 });
