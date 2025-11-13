@@ -2,6 +2,7 @@
 import Perfil from './src/screens/Perfil';
 import HomeApp from './src/screens/HomeApp';
 import React, { useState, useRef, useEffect } from 'react';
+import { Animated, Easing } from 'react-native';
 import {
   View,
   Text,
@@ -10,7 +11,6 @@ import {
   StyleSheet,
   Image,
   ScrollView,
-  Animated,
   Platform,
 } from 'react-native';
 
@@ -20,11 +20,23 @@ export default function App() {
   const [senha, setSenha] = useState('');
   const [telaAtual, setTelaAtual] = useState('homeApp');
 
-
   // estado para armazenar produto selecionado
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  // fade padrão já existente
   const fade = useRef(new Animated.Value(1)).current;
+
+  // 🎯 Novo: fade para transição suave entre telas internas
+  const fadeTela = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    fadeTela.setValue(0);
+    Animated.timing(fadeTela, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [screen]);
 
   const transitionTo = (nextScreen) => {
     Animated.timing(fade, {
@@ -149,30 +161,32 @@ export default function App() {
         );
 
       case 'homeApp':
-  return (
-    <HomeApp
-      onNavigate={(target, data = null) => {
-        // se for detalhes do pedido, grava o produto selecionado e faz a transição (mantendo sua animação)
-        if (target === 'detalhesPedido') {
-          setSelectedProduct(data);
-          transitionTo('detalhesPedido');
-          return;
-        }
-        // caso normal: só transita para a tela desejada
-        transitionTo(target);
-      }}
-    />
-  );
+        return (
+          <HomeApp
+            onNavigate={(target, data = null) => {
+              if (target === 'detalhesPedido') {
+                setSelectedProduct(data);
+                transitionTo('detalhesPedido');
+                return;
+              }
+              transitionTo(target);
+            }}
+          />
+        );
 
-  case 'perfil':
-  return <Perfil onVoltar={() => transitionTo('homeApp')} />;
+      case 'perfil':
+        return <Perfil onVoltar={() => transitionTo('homeApp')} />;
+
       case 'detalhesPedido':
         return (
           <Animated.View style={[styles.screenContainer, { opacity: fade, padding: 20, alignItems: 'center' }]}>
             <Text style={styles.title}>Detalhes do Pedido</Text>
             {selectedProduct && (
               <>
-                <Image source={{ uri: selectedProduct.image }} style={{ width: 150, height: 150, borderRadius: 16, marginTop: 20 }} />
+                <Image
+                  source={{ uri: selectedProduct.image }}
+                  style={{ width: 150, height: 150, borderRadius: 16, marginTop: 20 }}
+                />
                 <Text style={styles.subtitle}>{selectedProduct.title}</Text>
                 <Text style={styles.cardPrice}>{selectedProduct.price}</Text>
 
@@ -209,7 +223,12 @@ export default function App() {
     }
   };
 
-  return <View style={styles.appMain}>{renderScreen()}</View>;
+  // 🎯 Aqui aplicamos o fadeTela global
+  return (
+    <Animated.View style={[styles.appMain, { opacity: fadeTela }]}>
+      {renderScreen()}
+    </Animated.View>
+  );
 }
 
 const styles = StyleSheet.create({
