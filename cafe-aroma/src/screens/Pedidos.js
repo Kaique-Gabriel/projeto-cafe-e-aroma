@@ -5,23 +5,26 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 export default function Pedidos({ onNavigate }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Detalhes do Pedido ☕</Text>
+      <Text style={styles.title}>☕ Detalhes do Pedido</Text>
+
       <Text style={styles.subtitle}>
-        Aqui você verá o resumo e confirmação do seu pedido.
+        Aqui você verá o resumo e a confirmação do seu pedido.
       </Text>
 
+      {/* Botão principal */}
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: '#7b4f33' }]}
+        style={styles.primaryButton}
         onPress={() => onNavigate('meusPedidos')}
       >
-        <Text style={styles.buttonText}>Ver Meus Pedidos</Text>
+        <Text style={styles.primaryText}>Ver Meus Pedidos</Text>
       </TouchableOpacity>
 
+      {/* Botão secundário */}
       <TouchableOpacity
-        style={[styles.button, styles.outlineButton]}
+        style={styles.secondaryButton}
         onPress={() => onNavigate('homeApp')}
       >
-        <Text style={[styles.buttonText, { color: '#7b4f33' }]}>Voltar</Text>
+        <Text style={styles.secondaryText}>Voltar</Text>
       </TouchableOpacity>
     </View>
   );
@@ -30,37 +33,52 @@ export default function Pedidos({ onNavigate }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7efe6',
+    backgroundColor: '#1B1A1A', // fundo escuro elegante
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    padding: 25,
   },
   title: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '700',
-    color: '#4b2e1e',
+    color: '#D9C5A3', // marrom claro café
     marginBottom: 10,
   },
   subtitle: {
-    fontSize: 15,
-    color: '#6e4f36',
-    marginBottom: 25,
-    textAlign: 'center',
-  },
-  button: {
-    paddingVertical: 12,
-    paddingHorizontal: 22,
-    borderRadius: 25,
-    marginVertical: 8,
-  },
-  outlineButton: {
-    borderWidth: 2,
-    borderColor: '#7b4f33',
-    backgroundColor: 'transparent',
-  },
-  buttonText: {
-    fontWeight: '700',
-    color: '#fff',
     fontSize: 16,
+    color: '#B8A48A',
+    textAlign: 'center',
+    marginBottom: 35,
+    lineHeight: 22,
+  },
+
+  // Botão principal
+  primaryButton: {
+    width: '80%',
+    backgroundColor: '#7A4E2F', // marrom elegante
+    paddingVertical: 14,
+    borderRadius: 18,
+    marginBottom: 15,
+    alignItems: 'center',
+  },
+  primaryText: {
+    color: '#FFF',
+    fontWeight: '700',
+    fontSize: 17,
+  },
+
+  // Botão secundário
+  secondaryButton: {
+    width: '80%',
+    borderWidth: 2,
+    borderColor: '#7A4E2F',
+    paddingVertical: 14,
+    borderRadius: 18,
+    alignItems: 'center',
+  },
+  secondaryText: {
+    color: '#D9C5A3',
+    fontWeight: '700',
+    fontSize: 17,
   },
 });

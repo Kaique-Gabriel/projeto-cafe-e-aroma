@@ -61,6 +61,7 @@ export default function HomeApp({ onNavigate }) {
       {/* Cabeçalho */}
       <View style={styles.header}>
         <Text style={styles.logo}>Café & Aroma</Text>
+
         <TouchableOpacity onPress={() => onNavigate('perfil')}>
           <Image
             source={{ uri: 'https://i.imgur.com/Jf0X8gu.png' }}
@@ -87,15 +88,16 @@ export default function HomeApp({ onNavigate }) {
           ))}
         </ScrollView>
 
-        {/* Seção de Produtos */}
+        {/* Produtos */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>☕ Nossos Produtos</Text>
+
           <View style={styles.productGrid}>
             {products.map((item) => (
               <TouchableOpacity
                 key={item.id}
                 style={styles.card}
-                activeOpacity={0.8}
+                activeOpacity={0.85}
                 onPress={() => onNavigate('detalhesPedido', item)}
               >
                 <Image source={{ uri: item.img }} style={styles.cardImage} />
@@ -108,7 +110,7 @@ export default function HomeApp({ onNavigate }) {
           </View>
         </View>
 
-        {/* Botão "Meus Pedidos" */}
+        {/* Meus Pedidos */}
         <TouchableOpacity
           style={styles.meusPedidosBtn}
           onPress={() => onNavigate('meusPedidos')}
@@ -123,9 +125,11 @@ export default function HomeApp({ onNavigate }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1f130b',
+    backgroundColor: '#1C1209', // marrom quase preto elegante
     paddingTop: 50,
   },
+
+  // HEADER
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -134,21 +138,22 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   logo: {
-    fontSize: 24,
-    color: '#f5f5f5',
+    fontSize: 26,
+    color: '#F3E5D0', // bege claro café premium
     fontWeight: 'bold',
+    letterSpacing: 0.5,
   },
   avatar: {
     width: 42,
     height: 42,
     borderRadius: 21,
     borderWidth: 2,
-    borderColor: '#a37b5a',
+    borderColor: '#C7A27A', // dourado suave café
   },
 
-  // Carrossel
+  // CARROSSEL
   carousel: {
-    marginTop: 10,
+    marginTop: 12,
   },
   promoCard: {
     width: width * 0.88,
@@ -156,7 +161,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
     marginHorizontal: 10,
-    backgroundColor: '#2b1b12',
+    backgroundColor: '#2A1A10',
   },
   promoImage: {
     width: '100%',
@@ -171,21 +176,21 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.45)',
   },
   promoText: {
-    color: '#fff',
+    color: '#FFF',
     fontSize: 16,
     fontWeight: '600',
   },
 
-  // Produtos
+  // PRODUTOS
   section: {
     paddingHorizontal: 20,
-    marginTop: 25,
+    marginTop: 28,
   },
   sectionTitle: {
-    color: '#f5f5f5',
+    color: '#F3E5D0',
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   productGrid: {
     flexDirection: 'row',
@@ -193,11 +198,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   card: {
-    backgroundColor: '#2b1b12',
+    backgroundColor: '#2A1A10',
     borderRadius: 14,
     width: '48%',
-    marginBottom: 14,
+    marginBottom: 16,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#3B2516', // detalhe sutil premium
   },
   cardImage: {
     width: '100%',
@@ -207,26 +214,32 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   cardTitle: {
-    color: '#f5f5f5',
+    color: '#F5EDE3',
     fontSize: 15,
     fontWeight: '600',
   },
   cardPrice: {
-    color: '#d4c6be',
+    color: '#D5C3A4',
     marginTop: 4,
   },
 
-  // Meus Pedidos
+  // MEUS PEDIDOS BTN
   meusPedidosBtn: {
-    backgroundColor: '#5d4037',
+    backgroundColor: '#5A3E2B', // marrom médio elegante
     borderRadius: 25,
     marginHorizontal: 60,
     marginVertical: 30,
     paddingVertical: 12,
     alignItems: 'center',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 3,
   },
   meusPedidosText: {
-    color: '#fff',
+    color: '#F3E5D0',
     fontWeight: 'bold',
+    fontSize: 15,
   },
 });

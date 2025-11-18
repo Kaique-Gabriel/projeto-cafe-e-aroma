@@ -1,3 +1,4 @@
+// src/screens/Login.js
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
@@ -9,19 +10,22 @@ export default function Login({ onBack }) {
       <TextInput
         style={styles.input}
         placeholder="E-mail"
-        placeholderTextColor="#7b4f33"
+        placeholderTextColor="#A78C7A"
       />
+
       <TextInput
         style={styles.input}
         placeholder="Senha"
-        placeholderTextColor="#7b4f33"
+        placeholderTextColor="#A78C7A"
         secureTextEntry
       />
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Entrar</Text>
+      {/* Botão principal */}
+      <TouchableOpacity style={styles.loginButton}>
+        <Text style={styles.loginText}>Entrar</Text>
       </TouchableOpacity>
 
+      {/* Voltar */}
       <TouchableOpacity onPress={onBack} style={styles.backButton}>
         <Text style={styles.backText}>Voltar</Text>
       </TouchableOpacity>
@@ -34,43 +38,53 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fef7f2',
-    padding: 20,
+    backgroundColor: '#1B1A1A', // fundo escuro elegante
+    padding: 25,
   },
+
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#4b2e1e',
-    marginBottom: 20,
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#D9C5A3', // creme café suave
+    marginBottom: 30,
   },
+
   input: {
-    width: '80%',
-    backgroundColor: '#fff',
+    width: '85%',
+    backgroundColor: '#2A2727', // caixa escura
     borderWidth: 1,
-    borderColor: '#7b4f33',
-    borderRadius: 10,
+    borderColor: '#7A4E2F', // contorno café
+    borderRadius: 12,
     paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingVertical: 12,
     marginBottom: 15,
     fontSize: 16,
-    color: '#4b2e1e',
+    color: '#E6D5BD', // texto claro
   },
-  button: {
-    backgroundColor: '#7b4f33',
-    paddingVertical: 12,
-    paddingHorizontal: 40,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-  },
-  backButton: {
+
+  loginButton: {
+    width: '85%',
+    backgroundColor: '#7A4E2F', // marrom café
+    paddingVertical: 14,
+    borderRadius: 14,
+    alignItems: 'center',
     marginTop: 10,
   },
+
+  loginText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+
+  backButton: {
+    marginTop: 15,
+    padding: 10,
+  },
+
   backText: {
-    color: '#7b4f33',
+    color: '#B8A48A',
     fontSize: 16,
+    fontWeight: '600',
   },
 });
