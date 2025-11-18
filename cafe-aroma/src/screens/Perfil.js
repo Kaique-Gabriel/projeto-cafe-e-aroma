@@ -1,4 +1,3 @@
-// src/screens/Perfil.js
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -13,7 +12,6 @@ let AsyncStorage = null;
 try {
   AsyncStorage = require('@react-native-async-storage/async-storage').default;
 } catch (e) {
-  console.warn('[Perfil] AsyncStorage não encontrado. Usando memória temporária.');
   AsyncStorage = null;
 }
 
@@ -58,7 +56,7 @@ export default function Perfil({ onVoltar }) {
           setDraft(saved);
         }
       } catch (err) {
-        console.warn('[Perfil] erro ao carregar perfil:', err);
+        // ignore
       } finally {
         if (mounted) setLoading(false);
       }
@@ -88,9 +86,15 @@ export default function Perfil({ onVoltar }) {
 
   const onSave = async () => {
     if (!validateDraft()) return;
-    await storageSet(STORAGE_KEY, draft);
-    setProfile(draft);
-    setEditing(false);
+    try {
+      await storageSet(STORAGE_KEY, draft);
+      setProfile(draft);
+      setEditing(false);
+      // volta para home para que HomeApp releia profile ao montar
+      onVoltar && onVoltar();
+    } catch (err) {
+      Alert.alert('Erro', 'Não foi possível salvar o perfil.');
+    }
   };
 
   const onCancel = () => {
@@ -110,6 +114,7 @@ export default function Perfil({ onVoltar }) {
     <View style={styles.container}>
       <Text style={styles.titulo}>Meu Perfil</Text>
 
+      {/* Avatar grande com iniciais */}
       <View style={styles.avatarContainer}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{getInitials(profile.name)}</Text>
@@ -141,7 +146,7 @@ export default function Perfil({ onVoltar }) {
               onChangeText={(t) => setDraft((s) => ({ ...s, name: t }))}
               style={styles.input}
               placeholder="Seu nome"
-              placeholderTextColor="#888"
+              placeholderTextColor="#8b6f51"
             />
 
             <Text style={styles.label}>E-mail</Text>
@@ -151,7 +156,7 @@ export default function Perfil({ onVoltar }) {
               style={styles.input}
               placeholder="email@exemplo.com"
               keyboardType="email-address"
-              placeholderTextColor="#888"
+              placeholderTextColor="#8b6f51"
             />
 
             <Text style={styles.label}>Telefone</Text>
@@ -161,7 +166,7 @@ export default function Perfil({ onVoltar }) {
               style={styles.input}
               placeholder="(xx) xxxxx-xxxx"
               keyboardType="phone-pad"
-              placeholderTextColor="#888"
+              placeholderTextColor="#8b6f51"
             />
           </View>
 
@@ -183,77 +188,77 @@ export default function Perfil({ onVoltar }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212',
+    backgroundColor: '#FBF7F2', // claro repaginado
     alignItems: 'center',
     padding: 20,
-    paddingTop: 48,
+    paddingTop: 40,
   },
   titulo: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 18,
+    color: '#4b2e1e',
+    marginBottom: 14,
   },
   avatarContainer: {
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 14,
   },
   avatar: {
-    width: 112,
-    height: 112,
+    width: 110,
+    height: 110,
     borderRadius: 56,
-    backgroundColor: '#8A5A44', // marrom café
-    borderWidth: 3,
-    borderColor: '#C69C6D', // dourado café
+    backgroundColor: '#D9B89B', // caramelo suave
+    borderWidth: 2,
+    borderColor: '#C69A78',
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: {
-    color: '#FFFFFF',
-    fontSize: 34,
+    color: '#3b2418',
+    fontSize: 32,
     fontWeight: '800',
   },
   infoContainer: {
     alignItems: 'center',
-    marginBottom: 18,
+    marginBottom: 14,
   },
   nome: {
     fontSize: 20,
-    color: '#FFFFFF',
+    color: '#3b2418',
     fontWeight: '700',
     marginBottom: 6,
   },
   email: {
-    fontSize: 15,
-    color: '#B8B8B8',
+    fontSize: 14,
+    color: '#7b5e57',
   },
   phone: {
-    fontSize: 15,
-    color: '#B8B8B8',
+    fontSize: 14,
+    color: '#7b5e57',
   },
   primaryButton: {
-    marginTop: 20,
-    backgroundColor: '#8A5A44', // botão café
+    marginTop: 18,
+    backgroundColor: '#7b5d49',
     paddingVertical: 12,
-    paddingHorizontal: 44,
-    borderRadius: 24,
+    paddingHorizontal: 40,
+    borderRadius: 22,
   },
   primaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+    color: '#fff',
+    fontSize: 15,
     fontWeight: '700',
   },
   secondaryButton: {
-    marginTop: 12,
+    marginTop: 10,
     borderWidth: 1,
-    borderColor: '#8A5A44',
+    borderColor: '#7b5d49',
     paddingVertical: 10,
-    paddingHorizontal: 36,
+    paddingHorizontal: 34,
     borderRadius: 22,
   },
   secondaryButtonText: {
-    color: '#C69C6D',
-    fontSize: 15,
+    color: '#7b5d49',
+    fontSize: 14,
     fontWeight: '700',
   },
   form: {
@@ -261,35 +266,37 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   label: {
-    color: '#B8B8B8',
+    color: '#7b5e57',
     marginBottom: 6,
-    marginTop: 12,
+    marginTop: 10,
     fontSize: 13,
     fontWeight: '600',
   },
   input: {
-    backgroundColor: '#1E1E1E',
+    backgroundColor: '#fff',
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#2A2A2A',
-    color: '#FFF',
+    borderColor: '#efe6db',
+    color: '#3b2418',
   },
   rowButtons: {
     flexDirection: 'row',
-    marginTop: 18,
+    marginTop: 16,
   },
   ghostButton: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#444',
+    borderColor: '#cbb79b',
     paddingVertical: 12,
-    paddingHorizontal: 26,
-    borderRadius: 24,
+    paddingHorizontal: 24,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   ghostButtonText: {
-    color: '#B8B8B8',
+    color: '#7b5d49',
     fontWeight: '700',
   },
 });
