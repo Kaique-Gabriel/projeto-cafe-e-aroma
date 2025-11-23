@@ -1,302 +1,122 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  TextInput,
-  Alert,
-} from 'react-native';
+// src/screens/Perfil.js
+import React from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 
-let AsyncStorage = null;
-try {
-  AsyncStorage = require('@react-native-async-storage/async-storage').default;
-} catch (e) {
-  AsyncStorage = null;
-}
-
-const STORAGE_KEY = '@cafeAroma_profile';
-const memoryStore = {};
-
-async function storageGet(key) {
-  if (AsyncStorage) {
-    const raw = await AsyncStorage.getItem(key);
-    return raw ? JSON.parse(raw) : null;
-  }
-  return memoryStore[key] || null;
-}
-
-async function storageSet(key, value) {
-  if (AsyncStorage) {
-    await AsyncStorage.setItem(key, JSON.stringify(value));
-  } else {
-    memoryStore[key] = value;
-  }
-}
-
-export default function Perfil({ onVoltar }) {
-  const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(false);
-
-  const [profile, setProfile] = useState({
-    name: 'João Café',
-    email: 'joaocafe@example.com',
-    phone: '',
-  });
-
-  const [draft, setDraft] = useState(profile);
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const saved = await storageGet(STORAGE_KEY);
-        if (mounted && saved) {
-          setProfile(saved);
-          setDraft(saved);
-        }
-      } catch (err) {
-        // ignore
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
-    return () => (mounted = false);
-  }, []);
-
-  const getInitials = (fullName) => {
-    if (!fullName) return '';
-    const parts = fullName.trim().split(/\s+/);
-    const a = parts[0]?.[0] || '';
-    const b = parts.length > 1 ? parts[parts.length - 1][0] : '';
-    return (a + b).toUpperCase();
-  };
-
-  const validateDraft = () => {
-    if (!draft.name || draft.name.trim().length < 2) {
-      Alert.alert('Nome inválido', 'Insira um nome com ao menos 2 caracteres.');
-      return false;
-    }
-    if (draft.email && !draft.email.includes('@')) {
-      Alert.alert('E-mail inválido', 'Insira um e-mail válido.');
-      return false;
-    }
-    return true;
-  };
-
-  const onSave = async () => {
-    if (!validateDraft()) return;
-    try {
-      await storageSet(STORAGE_KEY, draft);
-      setProfile(draft);
-      setEditing(false);
-      // volta para home para que HomeApp releia profile ao montar
-      onVoltar && onVoltar();
-    } catch (err) {
-      Alert.alert('Erro', 'Não foi possível salvar o perfil.');
-    }
-  };
-
-  const onCancel = () => {
-    setDraft(profile);
-    setEditing(false);
-  };
-
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.titulo}>Carregando perfil...</Text>
-      </View>
-    );
-  }
-
+export default function Perfil({ onBack, onNavigate }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Meu Perfil</Text>
+      <Text style={styles.title}>Meu Perfil</Text>
 
-      {/* Avatar grande com iniciais */}
-      <View style={styles.avatarContainer}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{getInitials(profile.name)}</Text>
-        </View>
+      {/* Foto de perfil */}
+      <View style={styles.profileWrapper}>
+        <Image
+          source={{ uri: "https://i.imgur.com/4ZQZ4Zg.png" }}
+          style={styles.profileImage}
+        />
+        <Text style={styles.profileName}>Usuário</Text>
+        <Text style={styles.profileEmail}>email@exemplo.com</Text>
       </View>
 
-      {!editing ? (
-        <>
-          <View style={styles.infoContainer}>
-            <Text style={styles.nome}>{profile.name}</Text>
-            <Text style={styles.email}>{profile.email || 'E-mail não definido'}</Text>
-            <Text style={styles.phone}>{profile.phone || 'Telefone não definido'}</Text>
-          </View>
+      {/* Botões */}
+      <View style={styles.buttons}>
+        <TouchableOpacity
+          style={styles.option}
+          onPress={() => onNavigate && onNavigate("EditarPerfil")}
+        >
+          <Text style={styles.optionText}>Editar Perfil</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity style={styles.primaryButton} onPress={() => setEditing(true)}>
-            <Text style={styles.primaryButtonText}>Editar Perfil</Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.option}
+          onPress={() => onNavigate && onNavigate("Enderecos")}
+        >
+          <Text style={styles.optionText}>Meus Endereços</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity style={styles.secondaryButton} onPress={onVoltar}>
-            <Text style={styles.secondaryButtonText}>Voltar</Text>
-          </TouchableOpacity>
-        </>
-      ) : (
-        <>
-          <View style={styles.form}>
-            <Text style={styles.label}>Nome</Text>
-            <TextInput
-              value={draft.name}
-              onChangeText={(t) => setDraft((s) => ({ ...s, name: t }))}
-              style={styles.input}
-              placeholder="Seu nome"
-              placeholderTextColor="#8b6f51"
-            />
+        <TouchableOpacity
+          style={styles.option}
+          onPress={() => onNavigate && onNavigate("Seguranca")}
+        >
+          <Text style={styles.optionText}>Segurança</Text>
+        </TouchableOpacity>
+      </View>
 
-            <Text style={styles.label}>E-mail</Text>
-            <TextInput
-              value={draft.email}
-              onChangeText={(t) => setDraft((s) => ({ ...s, email: t }))}
-              style={styles.input}
-              placeholder="email@exemplo.com"
-              keyboardType="email-address"
-              placeholderTextColor="#8b6f51"
-            />
-
-            <Text style={styles.label}>Telefone</Text>
-            <TextInput
-              value={draft.phone}
-              onChangeText={(t) => setDraft((s) => ({ ...s, phone: t }))}
-              style={styles.input}
-              placeholder="(xx) xxxxx-xxxx"
-              keyboardType="phone-pad"
-              placeholderTextColor="#8b6f51"
-            />
-          </View>
-
-          <View style={styles.rowButtons}>
-            <TouchableOpacity style={[styles.primaryButton, { marginRight: 12 }]} onPress={onSave}>
-              <Text style={styles.primaryButtonText}>Salvar</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.ghostButton} onPress={onCancel}>
-              <Text style={styles.ghostButtonText}>Cancelar</Text>
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
+      {/* Botão voltar */}
+      <TouchableOpacity style={styles.backButton} onPress={onBack}>
+        <Text style={styles.backText}>Voltar</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
+// ----- estilos -----
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FBF7F2', // claro repaginado
-    alignItems: 'center',
-    padding: 20,
-    paddingTop: 40,
+    backgroundColor: "#1B1A1A",
+    padding: 25,
   },
-  titulo: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#4b2e1e',
-    marginBottom: 14,
+
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#D9C5A3",
+    alignSelf: "center",
+    marginBottom: 25,
   },
-  avatarContainer: {
-    alignItems: 'center',
-    marginBottom: 14,
+
+  profileWrapper: {
+    alignItems: "center",
+    marginBottom: 25,
   },
-  avatar: {
-    width: 110,
-    height: 110,
-    borderRadius: 56,
-    backgroundColor: '#D9B89B', // caramelo suave
+
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     borderWidth: 2,
-    borderColor: '#C69A78',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderColor: "#7A4E2F",
   },
-  avatarText: {
-    color: '#3b2418',
-    fontSize: 32,
-    fontWeight: '800',
-  },
-  infoContainer: {
-    alignItems: 'center',
-    marginBottom: 14,
-  },
-  nome: {
-    fontSize: 20,
-    color: '#3b2418',
-    fontWeight: '700',
-    marginBottom: 6,
-  },
-  email: {
-    fontSize: 14,
-    color: '#7b5e57',
-  },
-  phone: {
-    fontSize: 14,
-    color: '#7b5e57',
-  },
-  primaryButton: {
-    marginTop: 18,
-    backgroundColor: '#7b5d49',
-    paddingVertical: 12,
-    paddingHorizontal: 40,
-    borderRadius: 22,
-  },
-  primaryButtonText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  secondaryButton: {
+
+  profileName: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#E6D5BD",
     marginTop: 10,
+  },
+
+  profileEmail: {
+    fontSize: 16,
+    color: "#B8A48A",
+  },
+
+  buttons: {
+    marginTop: 20,
+  },
+
+  option: {
+    backgroundColor: "#2A2727",
+    padding: 15,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#7b5d49',
-    paddingVertical: 10,
-    paddingHorizontal: 34,
-    borderRadius: 22,
+    borderColor: "#7A4E2F",
+    marginBottom: 15,
   },
-  secondaryButtonText: {
-    color: '#7b5d49',
-    fontSize: 14,
-    fontWeight: '700',
+
+  optionText: {
+    color: "#E6D5BD",
+    fontSize: 16,
+    fontWeight: "600",
   },
-  form: {
-    width: '100%',
-    marginTop: 6,
+
+  backButton: {
+    marginTop: 20,
+    alignSelf: "center",
   },
-  label: {
-    color: '#7b5e57',
-    marginBottom: 6,
-    marginTop: 10,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  input: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#efe6db',
-    color: '#3b2418',
-  },
-  rowButtons: {
-    flexDirection: 'row',
-    marginTop: 16,
-  },
-  ghostButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#cbb79b',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  ghostButtonText: {
-    color: '#7b5d49',
-    fontWeight: '700',
+
+  backText: {
+    color: "#B8A48A",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

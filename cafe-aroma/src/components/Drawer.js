@@ -1,153 +1,87 @@
-// src/components/Drawer.js
-import React, { useEffect, useRef } from 'react';
-import {
-  Animated,
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Text,
-  Dimensions,
-  TouchableWithoutFeedback,
-  Platform,
-} from 'react-native';
+import React from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-const { width } = Dimensions.get('window');
+export default function Drawer() {
+  const navigation = useNavigation();
 
-export default function Drawer({ visible, onClose, setTelaAtual }) {
-  const slideAnim = useRef(new Animated.Value(-width * 0.7)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-
-  // controla animação de abertura/fechamento
-  useEffect(() => {
-    if (visible) {
-      Animated.parallel([
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 250,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    } else {
-      Animated.parallel([
-        Animated.timing(slideAnim, {
-          toValue: -width * 0.7,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 250,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    }
-  }, [visible]);
-
-  const navigate = (screen) => {
-    setTelaAtual(screen);
-    onClose();
-  };
-
-  if (!visible && fadeAnim.__getValue() === 0) {
-    // se estiver completamente fechado, não renderiza
-    return null;
+  function goTo(screen) {
+    navigation.navigate("MainApp", { screen });
   }
 
   return (
-    <View style={StyleSheet.absoluteFill}>
-      {/* Overlay escuro com clique para fechar */}
-      <TouchableWithoutFeedback onPress={onClose}>
-        <Animated.View
-          style={[
-            styles.overlay,
-            {
-              opacity: fadeAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, 0.4],
-              }),
-            },
-          ]}
+    <View style={styles.container}>
+      
+      {/* Topo - Avatar e Nome */}
+      <View style={styles.header}>
+        <Image
+          source={require('../../assets/images/profile/avatar-placeholder.png')}
+          style={styles.avatar}
         />
-      </TouchableWithoutFeedback>
+        <Text style={styles.username}>Olá, Usuário</Text>
+      </View>
 
-      {/* Painel lateral */}
-      <Animated.View
-        style={[
-          styles.drawer,
-          {
-            transform: [{ translateX: slideAnim }],
-          },
-        ]}
-      >
-        <View style={styles.header}>
-          <Text style={styles.appTitle}>☕ Café & Aroma</Text>
-        </View>
+      {/* Corpo do Drawer */}
+      <ScrollView style={styles.menu}>
 
-        <TouchableOpacity style={styles.item} onPress={() => navigate('homeApp')}>
+        <TouchableOpacity style={styles.item} onPress={() => goTo("HomeApp")}>
+          <Image
+            source={require('../../assets/images/icons/home.png')}
+            style={styles.icon}
+          />
           <Text style={styles.itemText}>Início</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item} onPress={() => navigate('perfil')}>
-          <Text style={styles.itemText}>Meu Perfil</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.item} onPress={() => navigate('detalhesPedido')}>
+        <TouchableOpacity style={styles.item} onPress={() => goTo("Pedidos")}>
+          <Image
+            source={require('../../assets/images/icons/pedidos.png')}
+            style={styles.icon}
+          />
           <Text style={styles.itemText}>Pedidos</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.item, { marginTop: 30 }]} onPress={onClose}>
-          <Text style={[styles.itemText, { color: '#b5744a' }]}>Fechar</Text>
+        <TouchableOpacity style={styles.item} onPress={() => goTo("Carrinho")}>
+          <Image
+            source={require('../../assets/images/icons/cart.png')}
+            style={styles.icon}
+          />
+          <Text style={styles.itemText}>Carrinho</Text>
         </TouchableOpacity>
-      </Animated.View>
+
+        <TouchableOpacity style={styles.item} onPress={() => goTo("Perfil")}>
+          <Image
+            source={require('../../assets/images/icons/user.png')}
+            style={styles.icon}
+          />
+          <Text style={styles.itemText}>Perfil</Text>
+        </TouchableOpacity>
+
+      </ScrollView>
+
+      {/* Botão Fechar */}
+      <View style={styles.footer}>
+        <TouchableOpacity onPress={() => goTo("HomeApp")} style={styles.closeButton}>
+          <Image
+            source={require('../../assets/images/icons/close.png')}
+            style={styles.closeIcon}
+          />
+        </TouchableOpacity>
+      </View>
+
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#000',
-  },
-  drawer: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: width * 0.7,
-    backgroundColor: 'rgba(255, 247, 237, 0.9)', // leve transparência
-    borderTopRightRadius: 22,
-    borderBottomRightRadius: 22,
-    paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'android' ? 48 : 60,
-    shadowColor: '#000',
-    shadowOpacity: 0.25,
-    shadowOffset: { width: 2, height: 4 },
-    shadowRadius: 8,
-    elevation: 6,
-    backdropFilter: Platform.OS === 'web' ? 'blur(8px)' : undefined, // efeito blur (web)
-  },
-  header: {
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(92, 61, 46, 0.2)',
-    marginBottom: 20,
-    paddingBottom: 8,
-  },
-  appTitle: {
-    fontSize: 22,
-    color: '#5C3D2E',
-    fontWeight: 'bold',
-  },
-  item: {
-    paddingVertical: 14,
-  },
-  itemText: {
-    fontSize: 16,
-    color: '#3E2723',
-    fontWeight: '600',
-  },
+  container: { flex: 1, paddingTop: 50, backgroundColor: '#FFF' },
+  header: { alignItems: 'center', marginBottom: 25 },
+  avatar: { width: 85, height: 85, borderRadius: 50, marginBottom: 10 },
+  username: { fontSize: 18, fontWeight: '600' },
+  menu: { flex: 1 },
+  item: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 20 },
+  itemText: { fontSize: 16, marginLeft: 15, fontWeight: '500' },
+  icon: { width: 26, height: 26, resizeMode: 'contain' },
+  footer: { padding: 20, borderTopWidth: 1, borderColor: '#eee' },
+  closeButton: { alignSelf: 'flex-start' },
+  closeIcon: { width: 26, height: 26 },
 });

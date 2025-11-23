@@ -1,164 +1,274 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   View,
   Text,
-  FlatList,
-  ScrollView,
-  StyleSheet,
   Image,
   TouchableOpacity,
+  StyleSheet,
+  FlatList,
   Animated,
   Dimensions,
-  Platform,
+  StatusBar,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import theme from '../theme/theme';
 
 const { width } = Dimensions.get('window');
-const H_PADDING = 20;
-const CARDS_CONTAINER_WIDTH = width - H_PADDING * 2;
-const CARD_GAP = 12;
-const CARD_WIDTH = Math.floor((CARDS_CONTAINER_WIDTH - CARD_GAP) / 2);
+const CARD_WIDTH = (width - 48) / 2;
+const CAROUSEL_HEIGHT = 170;
 
-export default function HomeApp({ onNavigate }) {
-  const [promos] = useState([
-    { id: 'p1', title: 'Café da Manhã Especial', img: 'https://i.imgur.com/dcA8X3j.jpg' },
-    { id: 'p2', title: 'Combo Croissant + Café', img: 'https://i.imgur.com/yQpO2Ax.png' },
-    { id: 'p3', title: 'Descontos do Dia ☕', img: 'https://i.imgur.com/xH4M8bA.jpg' },
-  ]);
+export default function HomeApp() {
+  const navigation = useNavigation();
 
-  const [products] = useState([
-    { id: '1', name: 'Cappuccino Tradicional', price: 'R$ 8,90', img: 'https://i.imgur.com/k9oZB8Y.jpg' },
-    { id: '2', name: 'Croissant de Chocolate', price: 'R$ 7,50', img: 'https://i.imgur.com/7yU1nSR.jpg' },
-    { id: '3', name: 'Pão de Queijo Gourmet', price: 'R$ 5,90', img: 'https://i.imgur.com/sHdYFvL.jpg' },
-    { id: '4', name: 'Café Gelado Vanilla', price: 'R$ 9,90', img: 'https://i.imgur.com/t1Bf87S.jpg' },
-  ]);
+  const produtos = [
+    { id: 1, nome: 'Cappuccino Tradicional', preco: 'R$ 12,90', imagem: require('../../assets/cards/cafe.png') },
+    { id: 2, nome: 'Pão Caseiro', preco: 'R$ 8,50', imagem: require('../../assets/cards/paes.png') },
+    { id: 3, nome: 'Doces Artesanais', preco: 'R$ 6,90', imagem: require('../../assets/cards/doces.png') },
+    { id: 4, nome: 'Promoção do Dia', preco: 'R$ 15,00', imagem: require('../../assets/cards/promo.png') },
+  ];
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const promos = [
+    { id: 'p1', img: require('../../assets/cards/promo.png'), title: 'Promoção do Dia' },
+    { id: 'p2', img: require('../../assets/cards/cafe.png'), title: 'Café Especial' },
+    { id: 'p3', img: require('../../assets/cards/doces.png'), title: 'Doces & Delícias' },
+  ];
+
+  const animValues = useRef(produtos.map(() => new Animated.Value(0))).current;
+  const scrollX = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }).start();
+    const animations = animValues.map((v, i) =>
+      Animated.timing(v, {
+        toValue: 1,
+        duration: 350,
+        delay: i * 120,
+        useNativeDriver: true,
+      })
+    );
+    Animated.stagger(80, animations).start();
   }, []);
 
-  // small scale on press visual feedback
-  const PressableCard = ({ item }) => {
-    const scale = useRef(new Animated.Value(1)).current;
+  const openDetalhes = (item) => {
+    navigation.navigate('DetalhesPedido', {
+      nome: item.nome,
+      preco: item.preco.replace('R$ ', ''),
+      imagem: Image.resolveAssetSource(item.imagem).uri,
+      descricao:
+        "Um delicioso " +
+        item.nome +
+        " preparado com ingredientes selecionados e fresquinhos.",
+    });
+  };
 
-    const onPressIn = () => Animated.spring(scale, { toValue: 0.98, useNativeDriver: true }).start();
-    const onPressOut = () => Animated.spring(scale, { toValue: 1, useNativeDriver: true }).start();
+  const renderProduto = (item, index) => {
+    const anim = animValues[index];
+    const scale = anim.interpolate({ inputRange: [0, 1], outputRange: [0.96, 1] });
+    const opacity = anim;
 
     return (
-      <Animated.View style={{ transform: [{ scale }], marginBottom: 6 }}>
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPressIn={onPressIn}
-          onPressOut={onPressOut}
-          onPress={() => onNavigate('detalhesPedido', item)}
-          style={styles.cardTouchable}
-        >
-          <Image source={{ uri: item.img }} style={styles.cardImage} />
-          <View style={styles.cardInfo}>
-            <Text style={styles.cardTitle} numberOfLines={2}>{item.name}</Text>
-            <Text style={styles.cardPrice}>{item.price}</Text>
-          </View>
+      <Animated.View key={item.id} style={[styles.card, { transform: [{ scale }], opacity }]}>
+        <TouchableOpacity activeOpacity={0.9} onPress={() => openDetalhes(item)} style={{ flex: 1 }}>
+          <Image source={item.imagem} style={styles.cardImage} />
+          <Text style={styles.cardTitle} numberOfLines={2}>{item.nome}</Text>
+          <Text style={styles.cardPrice}>{item.preco}</Text>
         </TouchableOpacity>
       </Animated.View>
     );
   };
 
   return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+
+      {/* HEADER */}
       <View style={styles.header}>
-        <Text style={styles.logo}>Café & Aroma</Text>
-        <TouchableOpacity onPress={() => onNavigate('perfil')}>
-          <Image source={{ uri: 'https://i.imgur.com/Jf0X8gu.png' }} style={styles.avatar} />
+        <View style={{ width: 40 }} />
+        <Text style={styles.title}>Café & Aroma</Text>
+
+        <TouchableOpacity onPress={() => navigation.navigate('Perfil')} style={styles.userBtn}>
+          <Image
+            source={require('../../assets/images/profile/avatar-placeholder.png')}
+            style={styles.userAvatar}
+          />
         </TouchableOpacity>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Carousel maior */}
-        <ScrollView
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.carousel}
-        >
-          {promos.map((promo) => (
-            <View key={promo.id} style={styles.promoCard}>
-              <Image source={{ uri: promo.img }} style={styles.promoImage} />
-              <View style={styles.promoOverlay}>
-                <Text style={styles.promoText}>{promo.title}</Text>
-              </View>
-            </View>
-          ))}
-        </ScrollView>
+      {/* CARROSSEL */}
+      <Animated.FlatList
+        data={promos}
+        keyExtractor={(p) => p.id}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+          { useNativeDriver: true }
+        )}
+        snapToAlignment="center"
+        decelerationRate="fast"
+        contentContainerStyle={styles.carouselContainer}
+        renderItem={({ item, index }) => {
+          const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
+          const scale = scrollX.interpolate({
+            inputRange,
+            outputRange: [0.9, 1, 0.9],
+            extrapolate: 'clamp',
+          });
 
-        {/* Produtos em grid (FlatList com 2 colunas) */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>☕ Nossos Produtos</Text>
-          <FlatList
-            data={products}
-            keyExtractor={(i) => i.id}
-            numColumns={2}
-            columnWrapperStyle={{ justifyContent: 'space-between' }}
-            contentContainerStyle={{ paddingBottom: 12 }}
-            scrollEnabled={false} // integrado ao ScrollView pai
-            renderItem={({ item }) => <PressableCard item={item} />}
-            style={{ marginTop: 6 }}
-          />
-        </View>
+          return (
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => navigation.navigate('Promocoes')}
+            >
+              <Animated.View style={[styles.promoCard, { transform: [{ scale }] }]}>
+                <Image source={item.img} style={styles.promoImage} />
+              </Animated.View>
+            </TouchableOpacity>
+          );
+        }}
+      />
 
-        <TouchableOpacity style={styles.meusPedidosBtn} onPress={() => onNavigate('meusPedidos')}>
-          <Text style={styles.meusPedidosText}>Ver Meus Pedidos</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </Animated.View>
+      {/* DOTS */}
+      <View style={styles.dots}>
+        {promos.map((_, i) => {
+          const inputRange = [(i - 1) * width, i * width, (i + 1) * width];
+          const dotScale = scrollX.interpolate({
+            inputRange,
+            outputRange: [0.8, 1.2, 0.8],
+            extrapolate: 'clamp',
+          });
+          const opacity = scrollX.interpolate({
+            inputRange,
+            outputRange: [0.4, 1, 0.4],
+            extrapolate: 'clamp',
+          });
+
+          return (
+            <Animated.View
+              key={`dot-${i}`}
+              style={[styles.dot, { transform: [{ scale: dotScale }], opacity }]}
+            />
+          );
+        })}
+      </View>
+
+      {/* GRID */}
+      <View style={styles.gridWrap}>
+        <FlatList
+          data={produtos}
+          keyExtractor={(p) => String(p.id)}
+          numColumns={2}
+          columnWrapperStyle={styles.columnWrapper}
+          renderItem={({ item, index }) => renderProduto(item, index)}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 30 }}
+        />
+      </View>
+    </View>
   );
 }
 
+/* ---------------- STYLES ---------------- */
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1C1209', paddingTop: Platform.OS === 'android' ? 36 : 50 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: H_PADDING, paddingBottom: 8 },
-  logo: { fontSize: 26, color: '#F3E5D0', fontWeight: '700', letterSpacing: 0.4 },
-  avatar: { width: 44, height: 44, borderRadius: 22, borderWidth: 2, borderColor: '#C7A27A' },
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
 
-  // carousel
-  carousel: { paddingHorizontal: H_PADDING, paddingTop: 12 },
-  promoCard: { width: CARDS_CONTAINER_WIDTH * 0.98, height: 176, borderRadius: 14, overflow: 'hidden', marginRight: 12, backgroundColor: '#2A1A10' },
-  promoImage: { width: '100%', height: '100%' },
-  promoOverlay: { position: 'absolute', left: 0, right: 0, bottom: 0, padding: 12, backgroundColor: 'rgba(0,0,0,0.45)' },
-  promoText: { color: '#FFF', fontSize: 16, fontWeight: '600' },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 6,
+  },
+  title: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 22,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
 
-  // section
-  section: { paddingHorizontal: H_PADDING, marginTop: 22 },
-  sectionTitle: { color: '#F3E5D0', fontSize: 18, fontWeight: '700', marginBottom: 8 },
-
-  // product card
-  cardTouchable: {
-    width: CARD_WIDTH,
-    backgroundColor: '#2A1A10',
-    borderRadius: 12,
+  userBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#3B2516',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    elevation: 2,
+  },
+  userAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+
+  carouselContainer: {
+    paddingTop: 2,
+    paddingBottom: -6,
+  },
+  promoCard: {
+    width: width * 0.88,
+    height: CAROUSEL_HEIGHT,
+    borderRadius: theme.radius.md,
+    marginHorizontal: width * 0.06,
+    overflow: 'hidden',
+  },
+  promoImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+
+  dots: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    marginTop: 2,
+    marginBottom: 6,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: theme.colors.primary,
+    marginHorizontal: 4,
+  },
+
+  gridWrap: {
+    paddingHorizontal: 18,
+    paddingTop: 4,
+  },
+  columnWrapper: {
+    justifyContent: 'space-between',
     marginBottom: 8,
   },
-  cardImage: { width: '100%', height: 110 },
-  cardInfo: { padding: 8 },
-  cardTitle: { color: '#F5EDE3', fontSize: 14, fontWeight: '600' },
-  cardPrice: { color: '#D5C3A4', marginTop: 6 },
-
-  // meus pedidos btn
-  meusPedidosBtn: {
-    backgroundColor: '#5A3E2B',
-    borderRadius: 26,
-    marginHorizontal: 56,
-    marginVertical: 28,
-    paddingVertical: 12,
-    alignItems: 'center',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOpacity: 0.25,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 4,
+  card: {
+    width: CARD_WIDTH,
+    backgroundColor: '#FFF',
+    borderRadius: theme.radius.md,
+    marginBottom: 14,
+    overflow: 'hidden',
   },
-  meusPedidosText: { color: '#F3E5D0', fontWeight: '700', fontSize: 15 },
+  cardImage: {
+    width: '100%',
+    height: 120,
+  },
+  cardTitle: {
+    paddingHorizontal: 10,
+    paddingTop: 10,
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  cardPrice: {
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+    paddingTop: 6,
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.primary,
+  },
 });

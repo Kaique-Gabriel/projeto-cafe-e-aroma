@@ -1,24 +1,60 @@
 // src/screens/MeusPedidos.js
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import theme from '../theme/theme';
 
-export default function MeusPedidos({ onNavigate }) {
+export default function MeusPedidos() {
+  const navigation = useNavigation();
+
+  // Exemplo de pedidos (depois podemos puxar da API)
+  const meusPedidos = [
+    {
+      id: 1,
+      titulo: "Cappuccino Cremoso",
+      preco: "R$ 12,90",
+      status: "Entregue",
+      img: require('../../assets/cards/cafe.png'),
+    },
+    {
+      id: 2,
+      titulo: "Croissant de Chocolate",
+      preco: "R$ 9,50",
+      status: "A caminho",
+      img: require('../../assets/cards/doces.png'),
+    },
+    {
+      id: 3,
+      titulo: "Combo Café + Pão",
+      preco: "R$ 19,90",
+      status: "Preparando",
+      img: require('../../assets/cards/paes.png'),
+    },
+  ];
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Meus Pedidos</Text>
 
-      <Text style={styles.subtitle}>Histórico dos seus pedidos ☕</Text>
+      <ScrollView style={{ width: "100%" }} contentContainerStyle={{ paddingBottom: 30 }}>
 
-      <Text style={styles.text}>
-        Você ainda não fez nenhum pedido real.
-      </Text>
+        {meusPedidos.map((item) => (
+          <TouchableOpacity
+            key={item.id}
+            style={styles.card}
+            onPress={() => navigation.navigate("DetalhesPedido", { pedido: item })}
+          >
+            <Image source={item.img} style={styles.img} />
 
-      <TouchableOpacity
-        style={[styles.button, styles.primary]}
-        onPress={() => onNavigate('homeApp')}
-      >
-        <Text style={styles.buttonText}>Voltar para o início</Text>
-      </TouchableOpacity>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.cardTitle}>{item.titulo}</Text>
+              <Text style={styles.cardPrice}>{item.preco}</Text>
+              <Text style={styles.cardStatus}>Status: {item.status}</Text>
+            </View>
+          </TouchableOpacity>
+        ))}
+
+      </ScrollView>
     </View>
   );
 }
@@ -26,52 +62,40 @@ export default function MeusPedidos({ onNavigate }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1C1209', // fundo escuro café premium
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
+    backgroundColor: theme.colors.background,
+    paddingHorizontal: 18,
+    paddingTop: 50,
   },
-
   title: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#F3E5D0', // bege claro premium
-    marginBottom: 10,
+    ...theme.text.title,
+    marginBottom: 20,
+    textAlign: "left",
   },
-
-  subtitle: {
-    fontSize: 16,
-    color: '#D5C3A4', // bege médio suave
-    marginBottom: 6,
-    textAlign: 'center',
+  card: {
+    flexDirection: "row",
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    marginBottom: 14,
+    alignItems: "center",
+    ...theme.shadows.card,
   },
-
-  text: {
-    color: '#C7B8A2',
-    textAlign: 'center',
-    marginBottom: 25,
-    fontSize: 14,
+  img: {
+    width: 70,
+    height: 70,
+    borderRadius: theme.radius.sm,
+    marginRight: 12,
   },
-
-  button: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 25,
-    marginVertical: 8,
+  cardTitle: {
+    ...theme.text.subtitle,
+    marginBottom: 4,
   },
-
-  primary: {
-    backgroundColor: '#5A3E2B', // marrom médio elegante
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 3,
+  cardPrice: {
+    ...theme.text.body,
+    marginBottom: 4,
   },
-
-  buttonText: {
-    fontWeight: '700',
-    color: '#F3E5D0',
-    fontSize: 16,
+  cardStatus: {
+    ...theme.text.small,
+    opacity: 0.7,
   },
 });
