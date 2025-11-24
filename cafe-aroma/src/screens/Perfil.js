@@ -1,122 +1,164 @@
 // src/screens/Perfil.js
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { useUser } from "../context/UserContext"; // IMPORTANTE
 
-export default function Perfil({ onBack, onNavigate }) {
+export default function Perfil() {
+  const navigation = useNavigation();
+  const { user } = useUser();
+
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 40 }}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* TÍTULO */}
       <Text style={styles.title}>Meu Perfil</Text>
 
-      {/* Foto de perfil */}
+      {/* FOTO + DADOS */}
       <View style={styles.profileWrapper}>
         <Image
-          source={{ uri: "https://i.imgur.com/4ZQZ4Zg.png" }}
+          source={
+            user?.photo
+              ? { uri: user.photo }
+              : require("../../assets/images/profile/avatar-placeholder.png")
+          }
           style={styles.profileImage}
         />
-        <Text style={styles.profileName}>Usuário</Text>
-        <Text style={styles.profileEmail}>email@exemplo.com</Text>
+
+        <Text style={styles.profileName}>
+          {user?.name || "Usuário"}
+        </Text>
+
+        <Text style={styles.profileEmail}>
+          {user?.email || "email@exemplo.com"}
+        </Text>
       </View>
 
-      {/* Botões */}
-      <View style={styles.buttons}>
-        <TouchableOpacity
-          style={styles.option}
-          onPress={() => onNavigate && onNavigate("EditarPerfil")}
-        >
-          <Text style={styles.optionText}>Editar Perfil</Text>
-        </TouchableOpacity>
+      {/* OPÇÕES */}
+      <View style={styles.optionsContainer}>
+        <OptionItem
+          icon={require("../../assets/images/icons/user.png")}
+          label="Editar Perfil"
+          onPress={() => navigation.navigate("EditarPerfil")}
+        />
 
-        <TouchableOpacity
-          style={styles.option}
-          onPress={() => onNavigate && onNavigate("Enderecos")}
-        >
-          <Text style={styles.optionText}>Meus Endereços</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.option}
-          onPress={() => onNavigate && onNavigate("Seguranca")}
-        >
-          <Text style={styles.optionText}>Segurança</Text>
-        </TouchableOpacity>
+        <OptionItem
+          icon={require("../../assets/images/icons/close.png")}
+          label="Segurança"
+          onPress={() => navigation.navigate("Seguranca")}
+        />
       </View>
-
-      {/* Botão voltar */}
-      <TouchableOpacity style={styles.backButton} onPress={onBack}>
-        <Text style={styles.backText}>Voltar</Text>
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
-// ----- estilos -----
+/* COMPONENTE */
+function OptionItem({ icon, label, onPress }) {
+  return (
+    <TouchableOpacity style={styles.option} onPress={onPress}>
+      <View style={styles.iconBox}>
+        <Image source={icon} style={styles.icon} resizeMode="contain" />
+      </View>
+      <Text style={styles.optionText}>{label}</Text>
+      <Text style={styles.arrow}>›</Text>
+    </TouchableOpacity>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1B1A1A",
-    padding: 25,
+    backgroundColor: "#F4EEE9",
+    padding: 26,
   },
 
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "700",
-    color: "#D9C5A3",
-    alignSelf: "center",
+    textAlign: "center",
+    color: "#4C2E1E",
     marginBottom: 25,
   },
 
   profileWrapper: {
     alignItems: "center",
-    marginBottom: 25,
+    marginBottom: 30,
   },
 
   profileImage: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    borderWidth: 2,
-    borderColor: "#7A4E2F",
+    borderWidth: 3,
+    borderColor: "#C7B39A",
   },
 
   profileName: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#E6D5BD",
+    color: "#3D2B1F",
     marginTop: 10,
   },
 
   profileEmail: {
-    fontSize: 16,
-    color: "#B8A48A",
+    fontSize: 15,
+    color: "#7A6A58",
   },
 
-  buttons: {
-    marginTop: 20,
+  optionsContainer: {
+    marginTop: 10,
   },
 
   option: {
-    backgroundColor: "#2A2727",
-    padding: 15,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#7A4E2F",
-    marginBottom: 15,
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 16,
+    paddingHorizontal: 14,
+    borderRadius: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
   },
 
   optionText: {
-    color: "#E6D5BD",
-    fontSize: 16,
+    color: "#3D2B1F",
+    fontSize: 17,
     fontWeight: "600",
+    marginLeft: 14,
+    flex: 1,
   },
 
-  backButton: {
-    marginTop: 20,
-    alignSelf: "center",
+  iconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: "#EEE5DC",
+    justifyContent: "center",
+    alignItems: "center",
   },
 
-  backText: {
-    color: "#B8A48A",
-    fontSize: 16,
-    fontWeight: "600",
+  icon: {
+    width: 22,
+    height: 22,
+  },
+
+  arrow: {
+    fontSize: 26,
+    color: "#8C7B6A",
+    fontWeight: "300",
+    paddingHorizontal: 6,
   },
 });

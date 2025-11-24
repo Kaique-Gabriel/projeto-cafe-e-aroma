@@ -1,6 +1,14 @@
 // src/screens/Pedidos.js
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Animated,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import theme from '../theme/theme';
 
@@ -35,17 +43,22 @@ export default function Pedidos() {
   ];
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Pedidos</Text>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <Text style={styles.title}>Meus Pedidos</Text>
 
       <View style={styles.cardContainer}>
         {cards.map((item) => (
           <TouchableOpacity
             key={item.id}
             style={styles.card}
+            activeOpacity={0.85}
             onPress={() => navigation.navigate(item.screen)}
           >
-            <Image source={item.image} style={styles.cardImage} />
+            <View style={styles.imageWrapper}>
+              <Image source={item.image} style={styles.cardImage} />
+              <View style={styles.overlay} />
+            </View>
+
             <Text style={styles.cardTitle}>{item.title}</Text>
           </TouchableOpacity>
         ))}
@@ -58,44 +71,58 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
-    paddingHorizontal: 16,
-    paddingTop: 20,
+    paddingHorizontal: 18,
+    paddingTop: 28,
   },
 
   title: {
-    fontSize: 26,
+    fontSize: 30,
     fontWeight: 'bold',
     color: theme.colors.textPrimary,
-    marginBottom: 20,
+    marginBottom: 25,
+    letterSpacing: 0.5,
   },
 
   cardContainer: {
     flexDirection: 'column',
-    gap: 20,
-    marginBottom: 40,
+    gap: 24,
+    marginBottom: 80,
   },
 
   card: {
     backgroundColor: theme.colors.cardBackground,
-    borderRadius: 14,
+    borderRadius: 18,
     overflow: 'hidden',
-    elevation: 4,
+    elevation: 5,
     shadowColor: '#000',
     shadowOpacity: 0.15,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+  },
+
+  imageWrapper: {
+    width: '100%',
+    height: 160,
+    position: 'relative',
   },
 
   cardImage: {
     width: '100%',
-    height: 150,
+    height: '100%',
     resizeMode: 'cover',
   },
 
+  overlay: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.08)',
+  },
+
   cardTitle: {
-    padding: 14,
-    fontSize: 18,
-    fontWeight: '600',
+    padding: 16,
+    fontSize: 19,
+    fontWeight: '700',
     color: theme.colors.textPrimary,
   },
 });
