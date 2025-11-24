@@ -1,128 +1,186 @@
-// src/screens/Pedidos.js
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   View,
   Text,
-  Image,
-  TouchableOpacity,
   StyleSheet,
+  TouchableOpacity,
+  Image,
   ScrollView,
-  Animated,
+  Animated
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import theme from '../theme/theme';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-export default function Pedidos() {
-  const navigation = useNavigation();
+// telas internas
+import PedidosEmAndamento from './pedidos/PedidosEmAndamento';
+import MeusPedidosLista from './pedidos/MeusPedidosLista';
+import HistoricoPedidos from './pedidos/HistoricoPedidos';
+import Promocoes from './pedidos/Promocoes';
 
-  const cards = [
+// imagens dos cards
+const images = {
+  andamento: require('../../assets/cards/cafe.png'),
+  pedidos: require('../../assets/cards/paes.png'),
+  historico: require('../../assets/cards/doces.png'),
+  promo: require('../../assets/cards/promo.png'),
+};
+
+const Stack = createNativeStackNavigator();
+
+function PedidosHome({ navigation }) {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  // animação de fade-in suave ao abrir
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  const menu = [
     {
       id: 'andamento',
       title: 'Pedidos em andamento',
-      image: require('../../assets/cards/cafe.png'),
-      screen: 'MeusPedidos',
+      screen: 'PedidosEmAndamento',
+      image: images.andamento,
     },
     {
-      id: 'meuspedidos',
+      id: 'meus',
       title: 'Meus pedidos',
-      image: require('../../assets/cards/paes.png'),
-      screen: 'MeusPedidos',
+      screen: 'MeusPedidosLista',
+      image: images.pedidos,
     },
     {
-      id: 'historico',
+      id: 'hist',
       title: 'Histórico',
-      image: require('../../assets/cards/doces.png'),
-      screen: 'MeusPedidos',
+      screen: 'HistoricoPedidos',
+      image: images.historico,
     },
     {
       id: 'promo',
       title: 'Promoções',
-      image: require('../../assets/cards/promo.png'),
-      screen: 'HomeApp',
+      screen: 'Promocoes',
+      image: images.promo,
     },
   ];
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={styles.title}>Meus Pedidos</Text>
+    <Animated.View style={[stylesHome.container, { opacity: fadeAnim }]}>
+      <Text style={stylesHome.title}>Pedidos</Text>
 
-      <View style={styles.cardContainer}>
-        {cards.map((item) => (
-          <TouchableOpacity
-            key={item.id}
-            style={styles.card}
-            activeOpacity={0.85}
-            onPress={() => navigation.navigate(item.screen)}
-          >
-            <View style={styles.imageWrapper}>
-              <Image source={item.image} style={styles.cardImage} />
-              <View style={styles.overlay} />
-            </View>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={stylesHome.cardsContainer}>
+          {menu.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              style={stylesHome.card}
+              activeOpacity={0.85}
+              onPress={() => navigation.navigate(item.screen)}
+            >
+              <Image source={item.image} style={stylesHome.cardImage} />
 
-            <Text style={styles.cardTitle}>{item.title}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </ScrollView>
+              <View style={stylesHome.cardOverlay} />
+
+              <Text style={stylesHome.cardText}>{item.title}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+    </Animated.View>
   );
 }
 
-const styles = StyleSheet.create({
+export default function Pedidos() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="PedidosHome"
+        component={PedidosHome}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="PedidosEmAndamento"
+        component={PedidosEmAndamento}
+        options={{ title: 'Pedidos em andamento' }}
+      />
+      <Stack.Screen
+        name="MeusPedidosLista"
+        component={MeusPedidosLista}
+        options={{ title: 'Meus pedidos' }}
+      />
+      <Stack.Screen
+        name="HistoricoPedidos"
+        component={HistoricoPedidos}
+        options={{ title: 'Histórico' }}
+      />
+      <Stack.Screen
+        name="Promocoes"
+        component={Promocoes}
+        options={{ title: 'Promoções' }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+//
+// --- ESTILOS ---
+//
+
+const stylesHome = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
-    paddingHorizontal: 18,
-    paddingTop: 28,
+    backgroundColor: '#FFF7F0',
+    paddingHorizontal: 20,
+    paddingTop: 35,
   },
 
   title: {
-    fontSize: 30,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: theme.colors.textPrimary,
+    color: '#5A4632',
     marginBottom: 25,
-    letterSpacing: 0.5,
   },
 
-  cardContainer: {
+  cardsContainer: {
     flexDirection: 'column',
-    gap: 24,
-    marginBottom: 80,
+    gap: 22,
+    paddingBottom: 70,
   },
 
   card: {
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: 18,
-    overflow: 'hidden',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-  },
-
-  imageWrapper: {
     width: '100%',
     height: 160,
+    borderRadius: 18,
+    overflow: 'hidden',
     position: 'relative',
+    elevation: 4,
+
+    backgroundColor: '#0002',
   },
 
   cardImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
+    borderRadius: 18,
   },
 
-  overlay: {
+  cardOverlay: {
     position: 'absolute',
     width: '100%',
     height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.08)',
+    backgroundColor: 'rgba(0,0,0,0.22)',
   },
 
-  cardTitle: {
-    padding: 16,
-    fontSize: 19,
+  cardText: {
+    position: 'absolute',
+    bottom: 16,
+    left: 16,
+    fontSize: 20,
     fontWeight: '700',
-    color: theme.colors.textPrimary,
+    color: '#fff',
+    textShadowColor: 'rgba(0,0,0,0.7)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 4,
   },
 });

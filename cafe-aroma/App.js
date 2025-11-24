@@ -1,11 +1,12 @@
 // App.js
 import React from 'react';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { TouchableOpacity, Image } from 'react-native';
 
 // Telas
+import Welcome from './src/screens/Welcome';
 import Login from './src/screens/Login';
 import Cadastro from './src/screens/Cadastro';
 import HomeApp from './src/screens/HomeApp';
@@ -18,21 +19,24 @@ import Carrinho from './src/screens/Carrinho';
 // Novas telas
 import EditarPerfil from './src/screens/EditarPerfil';
 import Seguranca from './src/screens/Seguranca';
+import SobreApp from './src/screens/SobreApp';
+import Favoritos from './src/screens/Favoritos';
+import AjudaSuporte from './src/screens/AjudaSuporte';
 
 // Drawer customizado
 import DrawerCustom from './src/components/Drawer';
 
-// Contextos
-import { AppProvider, useApp } from './src/context/AppContext';
+// Providers
+import { AppProvider } from './src/context/AppContext';
 import { CarrinhoProvider } from './src/context/CarrinhoContext';
 import { UserProvider } from './src/context/UserContext';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
-/* --------------------------------------
-   🔥 MAIN DRAWER COM MENU HAMBÚRGUER
---------------------------------------- */
+/* ============================================================
+   MAIN DRAWER
+============================================================ */
 function MainDrawer() {
   return (
     <Drawer.Navigator
@@ -45,7 +49,7 @@ function MainDrawer() {
         drawerActiveTintColor: '#F5D7A1',
         drawerInactiveTintColor: '#D9C5A3',
 
-        // 👉 Botão de menu corrigido
+        // Menu hamburguer
         headerLeft: () => (
           <TouchableOpacity onPress={() => navigation.toggleDrawer()} style={{ marginLeft: 12 }}>
             <Image
@@ -70,34 +74,67 @@ function MainDrawer() {
   );
 }
 
-/* --------------------------------------
-            APP PRINCIPAL
---------------------------------------- */
+/* ============================================================
+   APP PRINCIPAL
+============================================================ */
 function AppContent() {
-  const { isDarkMode } = useApp();
-
   return (
-    <NavigationContainer theme={isDarkMode ? DarkTheme : DefaultTheme}>
-      <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Welcome">
 
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Cadastro" component={Cadastro} />
+        {/* TELAS SEM HEADER */}
+        <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false }} />
+        <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+        <Stack.Screen name="Cadastro" component={Cadastro} options={{ headerShown: false }} />
 
-        {/* Drawer Principal */}
-        <Stack.Screen name="MainApp" component={MainDrawer} />
+        {/* DRAWER PRINCIPAL */}
+        <Stack.Screen name="MainApp" component={MainDrawer} options={{ headerShown: false }} />
 
-        {/* Telas independentes */}
-        <Stack.Screen name="DetalhesPedido" component={DetalhesPedido} />
+        {/* TELAS COM BOTÃO DE VOLTAR AUTOMÁTICO */}
+        <Stack.Screen 
+          name="DetalhesPedido" 
+          component={DetalhesPedido}
+          options={{ title: "Detalhes do Pedido" }}
+        />
 
-        {/* Apenas se aberta por botão direto */}
-        <Stack.Screen name="EditarPerfil" component={EditarPerfil} />
-        <Stack.Screen name="Seguranca" component={Seguranca} />
+        <Stack.Screen 
+          name="EditarPerfil" 
+          component={EditarPerfil} 
+          options={{ title: 'Editar Perfil' }} 
+        />
+
+        <Stack.Screen 
+          name="Seguranca" 
+          component={Seguranca} 
+          options={{ title: 'Segurança' }} 
+        />
+
+        <Stack.Screen 
+          name="SobreApp" 
+          component={SobreApp} 
+          options={{ title: 'Sobre o App' }} 
+        />
+
+        <Stack.Screen 
+          name="Favoritos" 
+          component={Favoritos} 
+          options={{ title: 'Favoritos' }} 
+        />
+
+        <Stack.Screen 
+          name="AjudaSuporte" 
+          component={AjudaSuporte} 
+          options={{ title: 'Ajuda & Suporte' }} 
+        />
 
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
+/* ============================================================
+   PROVIDERS
+============================================================ */
 export default function App() {
   return (
     <UserProvider>

@@ -1,100 +1,141 @@
-// src/screens/Login.js
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Image, Animated } from 'react-native';
 
 export default function Login({ navigation }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  function handleLogin() {
-    // Quando apertar "Entrar", manda direto para o Drawer
-    navigation.replace("MainApp");
-  }
+  const fadeLogo = useRef(new Animated.Value(0)).current;
+  const fadeContent = useRef(new Animated.Value(0)).current;
 
-  function handleBack() {
-    navigation.navigate("Cadastro");
-  }
+  useEffect(() => {
+    Animated.sequence([
+      Animated.timing(fadeLogo, {
+        toValue: 1,
+        duration: 700,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeContent, {
+        toValue: 1,
+        duration: 700,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Entrar</Text>
-
-      <TextInput
-        style={styles.input}
-        placeholder="E-mail"
-        placeholderTextColor="#A78C7A"
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <Animated.Image
+        source={require('../../assets/images/icons/logo.png')}
+        style={[styles.logo, { opacity: fadeLogo }]}
+        resizeMode="contain"
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        placeholderTextColor="#A78C7A"
-        secureTextEntry
-      />
+      <Animated.View style={{ width: '100%', opacity: fadeContent }}>
+        <Text style={styles.title}>Entrar</Text>
+        <Text style={styles.subtitle}>Acesse sua conta para continuar ☕</Text>
 
-      {/* Botão principal */}
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginText}>Entrar</Text>
-      </TouchableOpacity>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
 
-      {/* Voltar */}
-      <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-        <Text style={styles.backText}>Voltar</Text>
-      </TouchableOpacity>
-    </View>
+        <TextInput
+          style={styles.input}
+          placeholder="Senha"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+
+        <TouchableOpacity
+          style={styles.btnPrimary}
+          activeOpacity={0.8}
+          onPress={() => navigation.navigate('MainApp')}
+        >
+          <Text style={styles.btnPrimaryText}>Entrar</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.btnSecondary}
+          onPress={() => navigation.navigate('Welcome')}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.btnSecondaryText}>Voltar</Text>
+        </TouchableOpacity>
+      </Animated.View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingHorizontal: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1B1A1A',
-    padding: 25,
+    backgroundColor: '#f7e7d3',
   },
-
+  logo: {
+    width: 140,
+    height: 140,
+    marginBottom: 20,
+  },
   title: {
     fontSize: 32,
-    fontWeight: '700',
-    color: '#D9C5A3',
-    marginBottom: 30,
+    fontWeight: '800',
+    color: '#4E342E',
+    marginBottom: 10,
+    textAlign: 'center',
   },
-
+  subtitle: {
+    fontSize: 16,
+    color: '#6D4C41',
+    marginBottom: 30,
+    textAlign: 'center',
+  },
   input: {
-    width: '85%',
-    backgroundColor: '#2A2727',
-    borderWidth: 1,
-    borderColor: '#7A4E2F',
+    width: '100%',
+    backgroundColor: '#fff',
+    padding: 15,
     borderRadius: 12,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
     marginBottom: 15,
     fontSize: 16,
-    color: '#E6D5BD',
+    borderWidth: 1,
+    borderColor: '#D7CCC8',
   },
-
-  loginButton: {
-    width: '85%',
-    backgroundColor: '#7A4E2F',
-    paddingVertical: 14,
+  btnPrimary: {
+    width: '100%',
+    backgroundColor: '#4E342E',
+    paddingVertical: 15,
     borderRadius: 14,
     alignItems: 'center',
-    marginTop: 10,
+    marginBottom: 15,
+    elevation: 3,
   },
-
-  loginText: {
-    color: '#FFF',
+  btnPrimaryText: {
+    color: '#F3E5D0',
     fontSize: 18,
     fontWeight: '700',
   },
-
-  backButton: {
-    marginTop: 15,
-    padding: 10,
+  btnSecondary: {
+    width: '100%',
+    paddingVertical: 15,
+    borderRadius: 14,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#4E342E',
   },
-
-  backText: {
-    color: '#B8A48A',
-    fontSize: 16,
-    fontWeight: '600',
+  btnSecondaryText: {
+    color: '#4E342E',
+    fontSize: 18,
+    fontWeight: '700',
   },
 });

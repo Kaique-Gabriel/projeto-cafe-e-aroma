@@ -1,136 +1,160 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Animated,
-  Easing
-} from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Image, Animated } from 'react-native';
 
-export default function Cadastro({ onNavigate }) {
-  const [fadeAnim] = useState(new Animated.Value(0));
+export default function Cadastro({ navigation }) {
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [confirmSenha, setConfirmSenha] = useState('');
 
-  React.useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 500,
-      easing: Easing.out(Easing.ease),
-      useNativeDriver: true
-    }).start();
+  const fadeLogo = useRef(new Animated.Value(0)).current;
+  const fadeContent = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.timing(fadeLogo, {
+        toValue: 1,
+        duration: 700,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeContent, {
+        toValue: 1,
+        duration: 700,
+        useNativeDriver: true,
+      }),
+    ]).start();
   }, []);
 
   return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-
-      <Text style={styles.title}>Crie sua conta</Text>
-      <Text style={styles.subtitle}>Preencha os campos abaixo</Text>
-
-      <View style={styles.formContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Nome completo"
-          placeholderTextColor="#b8a999"
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <Animated.Image
+          source={require('../../assets/images/icons/logo.png')}
+          style={[styles.logo, { opacity: fadeLogo }]}
+          resizeMode="contain"
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#b8a999"
-        />
+        <Animated.View style={{ width: '100%', opacity: fadeContent }}>
+          <Text style={styles.title}>Criar Conta</Text>
+          <Text style={styles.subtitle}>Cadastre-se e comece a aproveitar ☕</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Senha"
-          secureTextEntry
-          placeholderTextColor="#b8a999"
-        />
-      </View>
+          <TextInput
+            style={styles.input}
+            placeholder="Nome"
+            value={nome}
+            onChangeText={setNome}
+          />
 
-      <TouchableOpacity
-        style={styles.button}
-        activeOpacity={0.7}
-        onPress={() => onNavigate('home')}
-      >
-        <Text style={styles.buttonText}>Cadastrar</Text>
-      </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
 
-      <TouchableOpacity
-        onPress={() => onNavigate('home')}
-        style={styles.backButton}
-      >
-        <Text style={styles.backText}>Voltar</Text>
-      </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            placeholder="Senha"
+            value={senha}
+            onChangeText={setSenha}
+            secureTextEntry
+          />
 
-    </Animated.View>
+          <TextInput
+            style={styles.input}
+            placeholder="Confirmar Senha"
+            value={confirmSenha}
+            onChangeText={setConfirmSenha}
+            secureTextEntry
+          />
+
+          <TouchableOpacity
+            style={styles.btnPrimary}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('MainApp')}
+          >
+            <Text style={styles.btnPrimaryText}>Criar Conta</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.btnSecondary}
+            onPress={() => navigation.navigate('Welcome')}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.btnSecondaryText}>Voltar</Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#121212', 
-    alignItems: 'center',
+    paddingHorizontal: 25,
     justifyContent: 'center',
-    paddingHorizontal: 30,
+    alignItems: 'center',
+    backgroundColor: '#f7e7d3',
+    paddingBottom: 40,
   },
-
+  logo: {
+    width: 140,
+    height: 140,
+    marginBottom: 20,
+  },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
-    color: '#e4d7c5',
-    marginBottom: 5,
+    fontWeight: '800',
+    color: '#4E342E',
+    marginBottom: 10,
+    textAlign: 'center',
   },
-
   subtitle: {
-    fontSize: 15,
-    color: '#c7b8a4',
-    marginBottom: 25,
-  },
-
-  formContainer: {
-    width: '100%',
-    marginBottom: 25,
-  },
-
-  input: {
-    backgroundColor: '#1e1e1e',
-    paddingVertical: 14,
-    paddingHorizontal: 15,
-    borderRadius: 12,
-    color: '#fff',
     fontSize: 16,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: '#3a2f28', // detalhe café elegante
+    color: '#6D4C41',
+    marginBottom: 30,
+    textAlign: 'center',
   },
-
-  button: {
-    backgroundColor: '#8b5e3c', 
+  input: {
     width: '100%',
-    paddingVertical: 15,
+    backgroundColor: '#fff',
+    padding: 15,
     borderRadius: 12,
+    marginBottom: 15,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#D7CCC8',
+  },
+  btnPrimary: {
+    width: '100%',
+    backgroundColor: '#4E342E',
+    paddingVertical: 15,
+    borderRadius: 14,
     alignItems: 'center',
     marginBottom: 15,
-    shadowColor: '#8b5e3c',
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
+    elevation: 3,
   },
-
-  buttonText: {
-    color: '#fff',
+  btnPrimaryText: {
+    color: '#F3E5D0',
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
-
-  backButton: {
-    paddingVertical: 5,
+  btnSecondary: {
+    width: '100%',
+    paddingVertical: 15,
+    borderRadius: 14,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#4E342E',
   },
-
-  backText: {
-    color: '#c7b8a4',
-    fontSize: 15,
+  btnSecondaryText: {
+    color: '#4E342E',
+    fontSize: 18,
+    fontWeight: '700',
   },
 });
