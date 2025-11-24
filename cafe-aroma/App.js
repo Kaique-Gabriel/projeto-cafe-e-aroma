@@ -11,7 +11,6 @@ import Login from './src/screens/Login';
 import Cadastro from './src/screens/Cadastro';
 import HomeApp from './src/screens/HomeApp';
 import Pedidos from './src/screens/Pedidos';
-import MeusPedidos from './src/screens/MeusPedidos';
 import Perfil from './src/screens/Perfil';
 import DetalhesPedido from './src/screens/DetalhesPedido';
 import Carrinho from './src/screens/Carrinho';
@@ -30,6 +29,7 @@ import DrawerCustom from './src/components/Drawer';
 import { AppProvider } from './src/context/AppContext';
 import { CarrinhoProvider } from './src/context/CarrinhoContext';
 import { UserProvider } from './src/context/UserContext';
+import { FavoritosProvider } from './src/context/FavoritosContext'; // <-- ADICIONADO
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -49,7 +49,6 @@ function MainDrawer() {
         drawerActiveTintColor: '#F5D7A1',
         drawerInactiveTintColor: '#D9C5A3',
 
-        // Menu hamburguer
         headerLeft: () => (
           <TouchableOpacity onPress={() => navigation.toggleDrawer()} style={{ marginLeft: 12 }}>
             <Image
@@ -67,7 +66,6 @@ function MainDrawer() {
     >
       <Drawer.Screen name="HomeApp" component={HomeApp} options={{ title: 'Início' }} />
       <Drawer.Screen name="Pedidos" component={Pedidos} options={{ title: 'Pedidos' }} />
-      <Drawer.Screen name="MeusPedidos" component={MeusPedidos} options={{ title: 'Meus Pedidos' }} />
       <Drawer.Screen name="Perfil" component={Perfil} options={{ title: 'Meu Perfil' }} />
       <Drawer.Screen name="Carrinho" component={Carrinho} options={{ title: 'Carrinho' }} />
     </Drawer.Navigator>
@@ -82,15 +80,15 @@ function AppContent() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Welcome">
 
-        {/* TELAS SEM HEADER */}
+        {/* SEM HEADER */}
         <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="Cadastro" component={Cadastro} options={{ headerShown: false }} />
 
-        {/* DRAWER PRINCIPAL */}
+        {/* DRAWER */}
         <Stack.Screen name="MainApp" component={MainDrawer} options={{ headerShown: false }} />
 
-        {/* TELAS COM BOTÃO DE VOLTAR AUTOMÁTICO */}
+        {/* COM HEADER */}
         <Stack.Screen 
           name="DetalhesPedido" 
           component={DetalhesPedido}
@@ -133,14 +131,16 @@ function AppContent() {
 }
 
 /* ============================================================
-   PROVIDERS
+   PROVIDERS ENVOLVENDO TUDO
 ============================================================ */
 export default function App() {
   return (
     <UserProvider>
       <AppProvider>
         <CarrinhoProvider>
-          <AppContent />
+          <FavoritosProvider>   {/* <-- AGORA FUNCIONA */}
+            <AppContent />
+          </FavoritosProvider>
         </CarrinhoProvider>
       </AppProvider>
     </UserProvider>
