@@ -1,21 +1,32 @@
-// ThemeContext.js
-import React, { createContext, useContext, useState, useMemo } from 'react';
-import { colorsLight, colorsDark } from '../theme/colors';
-import createTheme from '../theme/theme';
+import React, { createContext, useState, useContext } from 'react';
 
 const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
-  const [isDark, setIsDark] = useState(false);
+  const [theme, setTheme] = useState('light'); // light = padrão
 
-  const colors = isDark ? colorsDark : colorsLight;
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
 
-  const theme = useMemo(() => createTheme(colors), [colors]);
-
-  const toggleTheme = () => setIsDark((prev) => !prev);
+  const colors = theme === 'light'
+    ? {
+        background: '#FFF8F0',
+        card: '#FFFFFF',
+        text: '#4A2C2A',
+        textSecondary: '#6E4E43',
+        accent: '#C58B62',
+      }
+    : {
+        background: '#1A1818',
+        card: '#2A2727',
+        text: '#E8D6C0',
+        textSecondary: '#BFA68C',
+        accent: '#E3B58B',
+      };
 
   return (
-    <ThemeContext.Provider value={{ theme, colors, isDark, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, colors, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );
