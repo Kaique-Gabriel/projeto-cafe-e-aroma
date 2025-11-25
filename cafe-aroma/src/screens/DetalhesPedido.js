@@ -1,50 +1,78 @@
-// screens/DetalhesPedido.js
+// ---------------- DetalhesPedido.js (VERSÃO ATUALIZADA E MELHORADA) ----------------
+
 import React from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  Image, 
-  ScrollView, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  Animated,
 } from 'react-native';
-import { useContext } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Feather } from '@expo/vector-icons';
+import { useContext, useRef } from 'react';
 import { CarrinhoContext } from '../context/CarrinhoContext';
 
 export default function DetalhesPedido({ route, navigation }) {
-  const { nome, descricao, preco, imagem } = route.params;
-  
-  const { carrinho, adicionarItem } = useContext(CarrinhoContext);
+  const { id, nome, preco, imagem } = route.params;
 
-  function adicionarAoCarrinho() {
-    adicionarItem({ nome, descricao, preco, imagem });
+  const { adicionarItem } = useContext(CarrinhoContext);
 
-    // feedback opcional (pode remover se quiser)
-    alert("Item adicionado ao carrinho!");
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
-    // opcional: navega para o carrinho depois
-    // navigation.navigate("Carrinho");
+  function animateButton() {
+    Animated.sequence([
+      Animated.timing(scaleAnim, { toValue: 0.92, duration: 80, useNativeDriver: true }),
+      Animated.timing(scaleAnim, { toValue: 1, duration: 80, useNativeDriver: true }),
+    ]).start();
+  }
+
+  function handleAddToCart() {
+    animateButton();
+
+    adicionarItem({
+      id,
+      nome,
+      preco,
+      imagem,
+    });
+
+    alert("Produto adicionado ao carrinho!");
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#f9f4ef' }}>
-      <ScrollView style={styles.container}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF8F0' }}>
+      
+      {/* -------- HEADER -------- */}
+ 
 
-        <Image source={{ uri: imagem }} style={styles.image} />
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
 
+        {/* -------- IMAGEM DO PRODUTO -------- */}
+        <Image source={imagem} style={styles.image} />
+
+        {/* -------- NOME -------- */}
         <Text style={styles.title}>{nome}</Text>
-        <Text style={styles.price}>R$ {preco}</Text>
 
+        {/* -------- PREÇO -------- */}
+        <Text style={styles.price}>R$ {Number(preco).toFixed(2)}</Text>
+
+        {/* -------- DESCRIÇÃO TEMPORÁRIA -------- */}
         <Text style={styles.sectionTitle}>Descrição</Text>
-        <Text style={styles.description}>{descricao}</Text>
+        <Text style={styles.description}>
+          Produto artesanal selecionado com carinho para garantir a melhor experiência.
+          Ideal para acompanhar seu café da manhã ou café da tarde.
+        </Text>
 
-        <TouchableOpacity 
-          style={styles.button}
-          onPress={adicionarAoCarrinho}
-        >
-          <Text style={styles.buttonText}>Adicionar ao Carrinho</Text>
-        </TouchableOpacity>
+        {/* -------- BOTÃO ADICIONAR AO CARRINHO -------- */}
+        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+          <TouchableOpacity style={styles.button} onPress={handleAddToCart}>
+            <Feather name="shopping-cart" size={20} color="#fff" style={{ marginRight: 8 }} />
+            <Text style={styles.buttonText}>Adicionar ao Carrinho</Text>
+          </TouchableOpacity>
+        </Animated.View>
 
       </ScrollView>
     </SafeAreaView>
@@ -53,55 +81,72 @@ export default function DetalhesPedido({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#f9f4ef',
-    flex: 1,
-    padding: 16,
+    paddingHorizontal: 18,
+    paddingTop: 10,
   },
+
+  /* Header */
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  backBtn: {
+    padding: 8,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#4A2C2A',
+    marginLeft: 10,
+  },
+
   image: {
     width: '100%',
     height: 260,
-    borderRadius: 14,
+    borderRadius: 18,
+    marginTop: 10,
     marginBottom: 20,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#4e342e',
+    fontSize: 27,
+    fontWeight: '700',
+    color: '#4A2C2A',
   },
   price: {
     fontSize: 22,
     fontWeight: 'bold',
-    marginVertical: 8,
-    color: '#6d4c41',
+    marginTop: 4,
+    marginBottom: 14,
+    color: '#C58B62',
   },
   sectionTitle: {
     fontSize: 18,
-    marginTop: 15,
-    marginBottom: 5,
+    marginBottom: 6,
     fontWeight: '600',
-    color: '#4e342e',
+    color: '#4A2C2A',
   },
   description: {
     fontSize: 15,
-    color: '#6d4c41',
-    lineHeight: 20,
+    lineHeight: 22,
+    color: '#6E4E43',
+    marginBottom: 22,
   },
-  button: {
-    marginTop: 30,
-    backgroundColor: '#6d4c41',
-    padding: 14,
-    borderRadius: 12,
-    alignItems: 'center',
 
+  button: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#C58B62',
+    padding: 15,
+    borderRadius: 14,
+    marginBottom: 40,
     elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
   },
   buttonText: {
     color: '#fff',
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });

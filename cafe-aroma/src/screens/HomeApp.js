@@ -1,6 +1,6 @@
-// ---------------- HomeApp.js (VERSÃO ATUALIZADA) ----------------
+// ---------------- HomeApp.js (VERSÃO ATUALIZADA E FUNCIONAL) ----------------
 
-import React, { useRef, useEffect, useContext, useState } from 'react';
+import React, { useRef, useEffect, useContext } from 'react';
 import {
   View,
   Text,
@@ -26,7 +26,6 @@ import theme from '../theme/theme';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 50) / 2;
-
 const CAROUSEL_HEIGHT = 110;
 
 export default function HomeApp() {
@@ -37,30 +36,69 @@ export default function HomeApp() {
 
   /* ---------------------------- Produtos ---------------------------- */
   const produtos = [
-    { id: 1, nome: 'Cappuccino Tradicional', preco: 12.90, imagem: require('../../assets/cards/cafe.png') },
-    { id: 2, nome: 'Pão Caseiro', preco: 8.50, imagem: require('../../assets/cards/paes.png') },
-    { id: 3, nome: 'Doces Artesanais', preco: 6.90, imagem: require('../../assets/cards/doces.png') },
-    { id: 4, nome: 'Promo Banner 1', preco: 15.00, imagem: require('../../assets/cards/promo.png') },
-    { id: 5, nome: 'Croissant Manteiga', preco: 7.90, imagem: require('../../assets/cards/croissant.png') },
-    { id: 6, nome: 'Café Moído Especial', preco: 19.90, imagem: require('../../assets/cards/cafe2.png') },
-    { id: 7, nome: 'Bolo Caseiro', preco: 9.50, imagem: require('../../assets/cards/bolo.png') },
-    { id: 8, nome: 'Combo Matinal', preco: 22.90, imagem: require('../../assets/cards/combo.png') },
-    { id: 9, nome: 'Expresso Rápido', preco: 7.50, imagem: require('../../assets/cards/expresso.png') },
-    { id: 10, nome: 'Sanduíche Natural', preco: 13.50, imagem: require('../../assets/cards/sanduiche.png') },
-    { id: 11, nome: 'Torrada Especial', preco: 5.90, imagem: require('../../assets/cards/torrada.png') },
-    { id: 12, nome: 'Suco Natural', preco: 6.90, imagem: require('../../assets/cards/suco.png') },
-  ];
+  { id: 1, nome: 'Cappuccino Tradicional', preco: 12.90, imagem: require('../../assets/cards/cafe.png') },
+  { id: 2, nome: 'Pão Caseiro', preco: 8.50, imagem: require('../../assets/cards/paes.png') },
+  { id: 3, nome: 'Brownie', preco: 6.90, imagem: require('../../assets/cards/doces.png') },
+  { id: 4, nome: 'Café & Croissant Especial', preco: 15.00, imagem: require('../../assets/cards/promo.png') },
+  { id: 5, nome: 'Croissant Manteiga', preco: 7.90, imagem: require('../../assets/cards/croissant.png') },
+  { id: 6, nome: 'Café Moído Especial', preco: 19.90, imagem: require('../../assets/cards/cafe2.png') },
+  { id: 7, nome: 'Bolo Caseiro', preco: 9.50, imagem: require('../../assets/cards/bolo.png') },
+  { id: 8, nome: 'Torta de limão', preco: 22.90, imagem: require('../../assets/cards/tortalimao.png') },
+  { id: 9, nome: 'Expresso Rápido', preco: 7.50, imagem: require('../../assets/cards/expresso.png') },
+  { id: 10, nome: 'Sanduíche Natural', preco: 13.50, imagem: require('../../assets/cards/sanduiche.png') },
+  { id: 11, nome: 'Torrada Especial', preco: 5.90, imagem: require('../../assets/cards/torrada.png') },
+  { id: 12, nome: 'Suco Natural', preco: 6.90, imagem: require('../../assets/cards/suco.png') },
+];
+
+    /* ---------------------------- CARROSSEL ---------------------------- */
 
   const promos = [
-    { id: 'p1', img: require('../../assets/cards/promo.png'), title: 'Promo Banner 1' },
-    { id: 'p2', img: require('../../assets/cards/cafe.png'), title: 'Promo Banner 2' },
-    { id: 'p3', img: require('../../assets/cards/doces.png'), title: 'Promo Banner 3' },
+    {
+      id: 'promo1',
+      title: 'Cappuccino Tradicional',
+      price: 12.90,
+      img: require('../../assets/cards/cafe.png'),
+      nav: {
+        id: 1,
+        nome: 'Cappuccino Tradicional',
+        preco: 12.90,
+        imagem: require('../../assets/cards/cafe.png'),
+        descricao: "Um cappuccino clássico com equilíbrio perfeito entre café, leite e espuma.",
+      }
+    },
+    {
+      id: 'promo2',
+      title: 'Pão Caseiro',
+      price: 8.50,
+      img: require('../../assets/cards/paes.png'),
+      nav: {
+        id: 2,
+        nome: 'Pão Caseiro',
+        preco: 8.50,
+        imagem: require('../../assets/cards/paes.png'),
+        descricao: "Pão artesanal feito com ingredientes frescos e fermentação natural.",
+      }
+    },
+    {
+      id: 'promo3',
+      title: 'Delícias Doceiras',
+      price: 6.90,
+      img: require('../../assets/cards/combo.png'),
+      nav: {
+        id: 3,
+        nome: 'Delícias Doceiras',
+        preco: 6.90,
+        imagem: require('../../assets/cards/combo.png'),
+        descricao: "Uma seleção deliciosa de doces fresquinhos, perfeitos para acompanhar seu café.",
+      }
+    },
   ];
+
 
   const animValues = useRef(produtos.map(() => new Animated.Value(0))).current;
   const scrollX = useRef(new Animated.Value(0)).current;
 
-  // Animação de cartão entrando
+  /* ---------------------------- Animação de entrada ---------------------------- */
   useEffect(() => {
     const animations = animValues.map((v, i) =>
       Animated.timing(v, {
@@ -73,7 +111,7 @@ export default function HomeApp() {
     Animated.stagger(50, animations).start();
   }, []);
 
-  /* ---------------------------- Animação do Carrinho ---------------------------- */
+  /* ---------------------------- Animação: Carrinho ---------------------------- */
   const cartAnimations = useRef(produtos.map(() => new Animated.Value(1))).current;
 
   function animateCart(index) {
@@ -102,18 +140,28 @@ export default function HomeApp() {
     animateCart(index);
   }
 
-  /* ---------------------------- Render Produto ---------------------------- */
+  /* ---------------------------- ABRIR DETALHES ---------------------------- */
+  function openDetalhes(item) {
+  navigation.navigate("DetalhesPedido", {
+    id: item.id,
+    nome: item.nome,
+    preco: item.preco,
+    imagem: item.imagem,
+    descricao: item.descricao || "Descrição detalhada deste produto ainda não foi informada.",
+  });
+}
+
+  /* ---------------------------- RENDER PRODUTO ---------------------------- */
   const renderProduto = ({ item, index }) => {
     const anim = animValues[index];
     const scale = anim.interpolate({ inputRange: [0, 1], outputRange: [0.95, 1] });
-    const opacity = anim;
 
     const favorito = isFavorito(item.id);
 
     return (
-      <Animated.View style={[styles.card, { transform: [{ scale }], opacity }]}>
+      <Animated.View style={[styles.card, { transform: [{ scale }], opacity: anim }]}>
 
-        {/* ❤️ Botão Favorito superior (único agora) */}
+        {/* ❤️ Favorito */}
         <TouchableOpacity style={styles.favBtn} onPress={() => toggleFavorito(item)}>
           <Ionicons
             name={favorito ? 'heart' : 'heart-outline'}
@@ -122,17 +170,17 @@ export default function HomeApp() {
           />
         </TouchableOpacity>
 
-        {/* IMAGEM + NOME + PREÇO */}
+        {/* CONTEÚDO DO CARD */}
         <TouchableOpacity activeOpacity={0.95} onPress={() => openDetalhes(item)} style={{ flex: 1 }}>
           <Image source={item.imagem} style={styles.cardImage} />
           <Text style={styles.cardTitle} numberOfLines={2}>{item.nome}</Text>
           <Text style={styles.cardPrice}>R$ {Number(item.preco).toFixed(2)}</Text>
         </TouchableOpacity>
 
-        {/* FOOTER — somente ícones */}
+        {/* FOOTER */}
         <View style={styles.cardFooter}>
 
-          {/* 🛒 Comprar — com animação */}
+          {/* 🛒 Comprar */}
           <TouchableOpacity onPress={() => handleAddToCart(item, index)}>
             <Animated.View style={{ transform: [{ scale: cartAnimations[index] }] }}>
               <MaterialCommunityIcons
@@ -143,10 +191,11 @@ export default function HomeApp() {
             </Animated.View>
           </TouchableOpacity>
 
-          {/* ℹ Detalhes */}
-          <TouchableOpacity onPress={() => openDetalhes(item)}>
-            <Feather name="info" size={22} color={theme.colors.textSecondary} />
-          </TouchableOpacity>
+          {/* ℹ Info */}
+          <TouchableOpacity onPress={() => navigation.navigate("PedidosInfo", { item })}>
+  <Feather name="info" size={22} color={theme.colors.textSecondary} />
+</TouchableOpacity>
+
         </View>
 
       </Animated.View>
@@ -188,6 +237,7 @@ export default function HomeApp() {
           decelerationRate="fast"
           renderItem={({ item, index }) => {
             const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
+
             const scale = scrollX.interpolate({
               inputRange,
               outputRange: [0.9, 1, 0.9],
@@ -195,7 +245,7 @@ export default function HomeApp() {
             });
 
             return (
-              <TouchableOpacity activeOpacity={0.9} onPress={() => navigation.navigate("Promocoes")}>
+              <TouchableOpacity onPress={() => navigation.navigate("Promocoes")} activeOpacity={0.9}>
                 <Animated.View style={[styles.promoCard, { transform: [{ scale }] }]}>
                   <Image source={item.img} style={styles.promoImage} />
                 </Animated.View>
@@ -208,6 +258,7 @@ export default function HomeApp() {
         <View style={styles.dots}>
           {promos.map((_, i) => {
             const inputRange = [(i - 1) * width, i * width, (i + 1) * width];
+
             const dotScale = scrollX.interpolate({
               inputRange,
               outputRange: [0.8, 1.2, 0.8],
@@ -221,10 +272,7 @@ export default function HomeApp() {
             });
 
             return (
-              <Animated.View
-                key={`dot-${i}`}
-                style={[styles.dot, { transform: [{ scale: dotScale }], opacity }]}
-              />
+              <Animated.View key={`dot-${i}`} style={[styles.dot, { transform: [{ scale: dotScale }], opacity }]} />
             );
           })}
         </View>
@@ -241,6 +289,7 @@ export default function HomeApp() {
           showsVerticalScrollIndicator={false}
         />
       </View>
+
     </View>
   );
 }
@@ -360,7 +409,7 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
   },
 
-  /* Footer somente ícones */
+  /* Footer ícones */
   cardFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -371,3 +420,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
