@@ -1,58 +1,129 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function SobreApp() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sobre o Café & Aroma</Text>
+    <ScrollView style={styles.container}>
 
-      <Text style={styles.text}>
-        O Café & Aroma é um aplicativo criado para trazer até você o melhor café da manhã e café da
-        tarde da sua região, com praticidade, conforto e rapidez.
+      {/* Header */}
+      <View style={styles.logoArea}>
+        <MaterialCommunityIcons name="coffee" size={48} color="#4A2C2A" />
+        <Text style={styles.appName}>Café & Aroma</Text>
+      </View>
+
+      <Text style={styles.sectionTitle}>Nossa História</Text>
+      <Text style={styles.paragraph}>
+        O Café & Aroma nasceu com o propósito de oferecer uma experiência única de café da manhã e tarde,
+        levando aconchego, sabor e praticidade até você.
       </Text>
 
-      <Text style={styles.section}>Versão atual:</Text>
-      <Text style={styles.text}>2.0.1</Text>
+      <Text style={styles.sectionTitle}>Missão</Text>
+      <Text style={styles.paragraph}>
+        Proporcionar aos nossos clientes momentos especiais por meio de bebidas e comidas de qualidade,
+        entregues com carinho e eficiência.
+      </Text>
 
-      <Text style={styles.section}>Desenvolvido por:</Text>
-      <Text style={styles.text}>Kaique Gabriel</Text>
+      <Text style={styles.sectionTitle}>Valores</Text>
+      <View style={styles.valuesList}>
+        <Text style={styles.valueItem}>• Qualidade acima de tudo</Text>
+        <Text style={styles.valueItem}>• Atendimento humanizado</Text>
+        <Text style={styles.valueItem}>• Entregas ágeis e cuidadosas</Text>
+        <Text style={styles.valueItem}>• Amor pelo que fazemos</Text>
+      </View>
+
+      {/* Card da empresa */}
+      <View style={styles.card}>
+        <MaterialCommunityIcons name="storefront-outline" size={32} color="#4A2C2A" />
+        <View style={{ marginLeft: 12, flex: 1 }}>
+          <Text style={styles.cardTitle}>Sobre a Empresa</Text>
+          <Text style={styles.cardText}>
+            Atendemos toda a região local com produtos frescos, selecionados e preparados por profissionais 
+            apaixonados pelo universo do café.
+          </Text>
+        </View>
+      </View>
 
       <Text style={styles.footer}>
-        Obrigado por usar o Café & Aroma! Esperamos que sua experiência seja deliciosa ☕✨
+        Obrigado por fazer parte da nossa jornada ☕✨
       </Text>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3E5D0',
-    padding: 20,
+    backgroundColor: '#FFF8F0',
+    paddingHorizontal: 20,
+    paddingTop: 40,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#4E342E',
-    marginBottom: 15,
+
+  logoArea: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 25,
   },
-  text: {
-    fontSize: 17,
-    color: '#5C4033',
-    marginBottom: 10,
-    lineHeight: 24,
+
+  appName: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#4A2C2A',
   },
-  section: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#4E342E',
+
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#4A2C2A',
     marginTop: 20,
   },
-  footer: {
-    marginTop: 40,
+
+  paragraph: {
     fontSize: 15,
-    color: '#6D4C41',
+    lineHeight: 22,
+    color: '#6E4E43',
+    marginTop: 6,
+  },
+
+  valuesList: {
+    marginTop: 10,
+    marginBottom: 15,
+  },
+
+  valueItem: {
+    fontSize: 15,
+    color: '#6E4E43',
+    marginBottom: 5,
+  },
+
+  card: {
+    flexDirection: 'row',
+    backgroundColor: '#FFF',
+    padding: 18,
+    borderRadius: 14,
+    elevation: 3,
+    marginTop: 20,
+    alignItems: 'center',
+  },
+
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#4A2C2A',
+    marginBottom: 5,
+  },
+
+  cardText: {
+    fontSize: 14,
+    color: '#7A6256',
+  },
+
+  footer: {
+    marginTop: 45,
     textAlign: 'center',
-    fontStyle: 'italic',
+    fontSize: 14,
+    color: '#7A6256',
+    marginBottom: 30,
   },
 });

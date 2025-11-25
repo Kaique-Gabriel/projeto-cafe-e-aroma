@@ -41,33 +41,18 @@ function MainDrawer() {
   return (
     <Drawer.Navigator
       initialRouteName="HomeApp"
-      drawerContent={(props) => <DrawerCustom {...props} />}
-      screenOptions={({ navigation }) => ({
-        headerStyle: { backgroundColor: '#4E342E' },
-        headerTintColor: '#F3E5D0',
+      screenOptions={{
+        headerShown: false, // 👈 REMOVE O HEADER FEIO COMPLETO
         drawerStyle: { backgroundColor: '#3B2922' },
         drawerActiveTintColor: '#F5D7A1',
         drawerInactiveTintColor: '#D9C5A3',
-
-        headerLeft: () => (
-          <TouchableOpacity onPress={() => navigation.toggleDrawer()} style={{ marginLeft: 12 }}>
-            <Image
-              source={require('./assets/images/icons/menu.png')}
-              style={{
-                width: 26,
-                height: 26,
-                tintColor: '#F3E5D0',
-              }}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-        ),
-      })}
+      }}
+      drawerContent={(props) => <DrawerCustom {...props} />}
     >
       <Drawer.Screen name="HomeApp" component={HomeApp} options={{ title: 'Início' }} />
-      <Drawer.Screen name="Pedidos" component={Pedidos} options={{ title: 'Pedidos' }} />
-      <Drawer.Screen name="Perfil" component={Perfil} options={{ title: 'Meu Perfil' }} />
-      <Drawer.Screen name="Carrinho" component={Carrinho} options={{ title: 'Carrinho' }} />
+      <Drawer.Screen name="Pedidos" component={Pedidos} />
+      <Drawer.Screen name="Perfil" component={Perfil} />
+      <Drawer.Screen name="Carrinho" component={Carrinho} />
     </Drawer.Navigator>
   );
 }
