@@ -1,9 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Image, Animated } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  Image,
+  Animated,
+  Vibration,
+  TouchableWithoutFeedback,
+  Keyboard,
+  ScrollView
+} from 'react-native';
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const [error, setError] = useState('');
+  const fadeError = useRef(new Animated.Value(0)).current;
 
   const fadeLogo = useRef(new Animated.Value(0)).current;
   const fadeContent = useRef(new Animated.Value(0)).current;
@@ -23,55 +40,106 @@ export default function Login({ navigation }) {
     ]).start();
   }, []);
 
+  const validarLogin = () => {
+    setError('');
+
+    if (!email.trim() || !password.trim()) {
+      return mostrarErro('Preencha todos os campos.');
+    }
+
+    const regexEmail = /\S+@\S+\.\S+/;
+    if (!regexEmail.test(email)) {
+      return mostrarErro('Digite um email válido.');
+    }
+
+    if (password.length < 6) {
+      return mostrarErro('A senha deve ter ao menos 6 caracteres.');
+    }
+
+    navigation.navigate('Codigo2FA', { email });
+  };
+
+  const mostrarErro = (msg) => {
+    setError(msg);
+    Vibration.vibrate(50);
+
+    fadeError.setValue(0);
+    Animated.timing(fadeError, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <Animated.Image
-        source={require('../../assets/images/icons/logo.png')}
-        style={[styles.logo, { opacity: fadeLogo }]}
-        resizeMode="contain"
-      />
-
-      <Animated.View style={{ width: '100%', opacity: fadeContent }}>
-        <Text style={styles.title}>Entrar</Text>
-        <Text style={styles.subtitle}>Acesse sua conta para continuar ☕</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Senha"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-
-        <TouchableOpacity
-          style={styles.btnPrimary}
-          activeOpacity={0.8}
-          onPress={() => navigation.navigate('MainApp')}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.btnPrimaryText}>Entrar</Text>
-        </TouchableOpacity>
+          <Animated.Image
+            source={require('../../assets/images/icons/logo.png')}
+            style={[styles.logo, { opacity: fadeLogo }]}
+            resizeMode="contain"
+          />
 
-        <TouchableOpacity
-          style={styles.btnSecondary}
-          onPress={() => navigation.navigate('Welcome')}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.btnSecondaryText}>Voltar</Text>
-        </TouchableOpacity>
-      </Animated.View>
-    </KeyboardAvoidingView>
+          <Animated.View style={{ width: '100%', opacity: fadeContent }}>
+            <Text style={styles.title}>Entrar</Text>
+            <Text style={styles.subtitle}>Acesse sua conta para continuar ☕</Text>
+
+            <TextInput
+              style={[
+                styles.input,
+                error && !email ? { borderColor: '#B71C1C' } : null,
+              ]}
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+
+            <TextInput
+              style={[
+                styles.input,
+                error && !password ? { borderColor: '#B71C1C' } : null,
+              ]}
+              placeholder="Senha"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+
+            {error !== '' && (
+              <Animated.Text style={[styles.errorText, { opacity: fadeError }]}>
+                {error}
+              </Animated.Text>
+            )}
+
+            <TouchableOpacity
+              style={styles.btnPrimary}
+              activeOpacity={0.8}
+              onPress={validarLogin}
+            >
+              <Text style={styles.btnPrimaryText}>Entrar</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.btnSecondary}
+              onPress={() => navigation.navigate('Welcome')}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.btnSecondaryText}>Voltar</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -79,14 +147,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: '#f7e7d3',
   },
   logo: {
     width: 140,
     height: 140,
     marginBottom: 20,
+    marginTop: 40,
   },
   title: {
     fontSize: 32,
@@ -111,6 +178,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#D7CCC8',
   },
+  errorText: {
+    fontSize: 14,
+    color: '#B71C1C',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
   btnPrimary: {
     width: '100%',
     backgroundColor: '#4E342E',
@@ -132,6 +205,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2,
     borderColor: '#4E342E',
+    marginBottom: 30,
   },
   btnSecondaryText: {
     color: '#4E342E',

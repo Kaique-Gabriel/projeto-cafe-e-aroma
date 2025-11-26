@@ -5,68 +5,92 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
+  KeyboardAvoidingView,
+  ScrollView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Platform
 } from "react-native";
 
-export default function Codigo2FA({ route, navigation }) {
-  const { codigoGerado, email } = route.params;
+export default function Codigo2FA({ navigation }) {
+  const codigoFixo = "123456";
+  const [codigo, setCodigo] = useState("");
 
-  const [codigoDigitado, setCodigoDigitado] = useState("");
-  const [erro, setErro] = useState("");
-
-  const validarCodigo = () => {
-    if (codigoDigitado === codigoGerado) {
-      navigation.replace("HomeApp");
+  function validarCodigo() {
+    if (codigo === codigoFixo) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "MainApp" }],
+      });
     } else {
-      setErro("Código incorreto. Tente novamente.");
+      Alert.alert("Código incorreto", "Tente novamente.");
     }
-  };
+  }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.titulo}>Confirmação de 2FA</Text>
-      <Text style={styles.subtitulo}>
-        Enviamos um código de 6 dígitos para o e-mail:
-      </Text>
-      <Text style={styles.email}>{email}</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+          
+          <View style={styles.container}>
+            <Text style={styles.title}>Verificação 2FA</Text>
+            <Text style={styles.subtitle}>Digite o código: 123456</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Digite o código"
-        keyboardType="numeric"
-        maxLength={6}
-        value={codigoDigitado}
-        onChangeText={setCodigoDigitado}
-      />
+            <TextInput
+              style={styles.input}
+              value={codigo}
+              onChangeText={setCodigo}
+              keyboardType="numeric"
+              maxLength={6}
+              placeholder="000000"
+            />
 
-      {erro.length > 0 && <Text style={styles.erro}>{erro}</Text>}
+            <TouchableOpacity style={styles.btn} onPress={validarCodigo}>
+              <Text style={styles.btnText}>Validar Código</Text>
+            </TouchableOpacity>
 
-      <TouchableOpacity onPress={validarCodigo} style={styles.botao}>
-        <Text style={styles.txtBotao}>Confirmar</Text>
-      </TouchableOpacity>
-    </View>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Text style={styles.btnVoltar}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 30, justifyContent: "center" },
-  titulo: { fontSize: 28, fontWeight: "bold", marginBottom: 10 },
-  subtitulo: { color: "#666", fontSize: 16 },
-  email: { fontSize: 16, fontWeight: "500", marginBottom: 20 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 10,
-    padding: 12,
-    fontSize: 20,
-    marginBottom: 15,
-    textAlign: "center",
+  container: { 
+    flex: 1, 
+    justifyContent: "center", 
+    alignItems: "center", 
+    padding: 20
   },
-  erro: { color: "red", marginBottom: 10 },
-  botao: {
-    backgroundColor: "#8B4513",
+  title: { fontSize: 28, fontWeight: "700", marginBottom: 10 },
+  subtitle: { fontSize: 16, marginBottom: 20 },
+  input: {
+    width: "80%",
+    backgroundColor: "#fff",
     padding: 15,
     borderRadius: 10,
-    alignItems: "center",
+    fontSize: 20,
+    textAlign: "center",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginBottom: 20,
   },
-  txtBotao: { color: "white", fontSize: 18, fontWeight: "bold" },
+  btn: {
+    backgroundColor: "#4E342E",
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  btnText: { color: "#fff", fontSize: 18, fontWeight: "700" },
+  btnVoltar: { color: "#4E342E", fontSize: 16, marginTop: 10 },
 });

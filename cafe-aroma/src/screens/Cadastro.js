@@ -1,5 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Image, Animated } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Animated,
+  Alert,
+} from 'react-native';
 
 export default function Cadastro({ navigation }) {
   const [nome, setNome] = useState('');
@@ -25,12 +36,38 @@ export default function Cadastro({ navigation }) {
     ]).start();
   }, []);
 
+  function validarCadastro() {
+    if (!nome.trim()) {
+      return Alert.alert("Ops!", "Por favor, insira seu nome.");
+    }
+
+    if (!email.includes('@') || !email.includes('.')) {
+      return Alert.alert("Email inválido", "Digite um email válido.");
+    }
+
+    if (senha.length < 6) {
+      return Alert.alert("Senha fraca", "A senha deve ter pelo menos 6 caracteres.");
+    }
+
+    if (senha !== confirmSenha) {
+      return Alert.alert("Senhas diferentes", "As senhas não coincidem.");
+    }
+
+    navigation.navigate('MainApp');
+  }
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0} 
     >
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+
         <Animated.Image
           source={require('../../assets/images/icons/logo.png')}
           style={[styles.logo, { opacity: fadeLogo }]}
@@ -76,7 +113,7 @@ export default function Cadastro({ navigation }) {
           <TouchableOpacity
             style={styles.btnPrimary}
             activeOpacity={0.8}
-            onPress={() => navigation.navigate('MainApp')}
+            onPress={validarCadastro}
           >
             <Text style={styles.btnPrimaryText}>Criar Conta</Text>
           </TouchableOpacity>
@@ -89,6 +126,7 @@ export default function Cadastro({ navigation }) {
             <Text style={styles.btnSecondaryText}>Voltar</Text>
           </TouchableOpacity>
         </Animated.View>
+
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -96,65 +134,69 @@ export default function Cadastro({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f7e7d3',
-    paddingBottom: 40,
+    flexGrow: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+    backgroundColor: "#F6EFE7",
   },
+
   logo: {
-    width: 140,
-    height: 140,
+    width: 180,
+    height: 180,
+    alignSelf: "center",
+    marginBottom: 10,
+  },
+
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#4C2E1E",
+    textAlign: "center",
+    marginBottom: 4,
+  },
+
+  subtitle: {
+    fontSize: 15,
+    color: "#7A5C47",
+    textAlign: "center",
     marginBottom: 20,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#4E342E',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#6D4C41',
-    marginBottom: 30,
-    textAlign: 'center',
-  },
+
   input: {
-    width: '100%',
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 15,
-    fontSize: 16,
+    backgroundColor: "#FFF",
+    width: "100%",
+    padding: 14,
+    borderRadius: 14,
+    marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#D7CCC8',
+    borderColor: "#C7B39A",
+    fontSize: 15,
   },
+
   btnPrimary: {
-    width: '100%',
-    backgroundColor: '#4E342E',
-    paddingVertical: 15,
-    borderRadius: 14,
-    alignItems: 'center',
-    marginBottom: 15,
-    elevation: 3,
+    backgroundColor: "#6A4A3C",
+    paddingVertical: 16,
+    borderRadius: 16,
+    alignItems: "center",
+    marginTop: 10,
   },
+
   btnPrimaryText: {
-    color: '#F3E5D0',
-    fontSize: 18,
-    fontWeight: '700',
+    color: "#FFF",
+    fontSize: 17,
+    fontWeight: "700",
   },
+
   btnSecondary: {
-    width: '100%',
-    paddingVertical: 15,
-    borderRadius: 14,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#4E342E',
+    marginTop: 14,
+    paddingVertical: 14,
+    alignItems: "center",
   },
+
   btnSecondaryText: {
-    color: '#4E342E',
-    fontSize: 18,
-    fontWeight: '700',
+    color: "#6A4A3C",
+    fontSize: 15,
+    fontWeight: "600",
   },
 });

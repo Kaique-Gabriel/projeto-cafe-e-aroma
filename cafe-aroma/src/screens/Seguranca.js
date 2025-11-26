@@ -7,6 +7,9 @@ import {
   TextInput,
   TouchableOpacity,
   Animated,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useUser } from "../context/UserContext";
@@ -14,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 export default function Seguranca() {
   const navigation = useNavigation();
-  const { user, updateUser } = useUser();   // <-- Agora correto!
+  const { user, updateUser } = useUser();
 
   const fadeAnim = useState(new Animated.Value(0))[0];
 
@@ -36,16 +39,13 @@ export default function Seguranca() {
     }).start();
   }, []);
 
-  // avalia força
   function calcularForcaSenha(senha) {
     let pontos = 0;
-
     if (senha.length >= 6) pontos++;
     if (senha.length >= 10) pontos++;
     if (/[A-Z]/.test(senha)) pontos++;
     if (/[0-9]/.test(senha)) pontos++;
     if (/[^A-Za-z0-9]/.test(senha)) pontos++;
-
     setPassStrength(pontos);
   }
 
@@ -55,7 +55,6 @@ export default function Seguranca() {
       return;
     }
 
-    // garante que o objeto user existe
     if (!user || !user.password) {
       alert("Erro: usuário não possui senha cadastrada.");
       return;
@@ -77,102 +76,113 @@ export default function Seguranca() {
     }
 
     updateUser({ password: newPass });
-
     alert("Senha alterada com sucesso!");
     navigation.goBack();
   }
 
   return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-      <Text style={styles.title}>Segurança</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: 40 }}
+      >
+        <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Alterar Senha</Text>
+          <Text style={styles.title}>Segurança</Text>
 
-        {/* Atual */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Senha atual"
-            secureTextEntry={!showOld}
-            style={styles.input}
-            value={oldPass}
-            onChangeText={setOldPass}
-          />
-          <TouchableOpacity
-            style={styles.eyeButton}
-            onPress={() => setShowOld(!showOld)}
-          >
-            <Ionicons
-              name={showOld ? "eye-off" : "eye"}
-              size={22}
-              color="#7A5C47"
-            />
-          </TouchableOpacity>
-        </View>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Alterar Senha</Text>
 
-        {/* Nova */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Nova senha"
-            secureTextEntry={!showNew}
-            style={styles.input}
-            value={newPass}
-            onChangeText={(txt) => {
-              setNewPass(txt);
-              calcularForcaSenha(txt);
-            }}
-          />
-          <TouchableOpacity
-            style={styles.eyeButton}
-            onPress={() => setShowNew(!showNew)}
-          >
-            <Ionicons
-              name={showNew ? "eye-off" : "eye"}
-              size={22}
-              color="#7A5C47"
-            />
-          </TouchableOpacity>
-        </View>
+            {/* Senha atual */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="Senha atual"
+                secureTextEntry={!showOld}
+                style={styles.input}
+                value={oldPass}
+                onChangeText={setOldPass}
+              />
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setShowOld(!showOld)}
+              >
+                <Ionicons
+                  name={showOld ? "eye-off" : "eye"}
+                  size={22}
+                  color="#7A5C47"
+                />
+              </TouchableOpacity>
+            </View>
 
-        {/* Barra de força */}
-        <View style={styles.strengthBar}>
-          {[1, 2, 3, 4, 5].map((i) => (
-            <View
-              key={i}
-              style={[
-                styles.strengthSegment,
-                { backgroundColor: passStrength >= i ? "#4CAF50" : "#D0BFAF" },
-              ]}
-            />
-          ))}
-        </View>
+            {/* Nova senha */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="Nova senha"
+                secureTextEntry={!showNew}
+                style={styles.input}
+                value={newPass}
+                onChangeText={(txt) => {
+                  setNewPass(txt);
+                  calcularForcaSenha(txt);
+                }}
+              />
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setShowNew(!showNew)}
+              >
+                <Ionicons
+                  name={showNew ? "eye-off" : "eye"}
+                  size={22}
+                  color="#7A5C47"
+                />
+              </TouchableOpacity>
+            </View>
 
-        {/* Confirmar */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Confirmar nova senha"
-            secureTextEntry={!showConfirm}
-            style={styles.input}
-            value={confirmPass}
-            onChangeText={setConfirmPass}
-          />
-          <TouchableOpacity
-            style={styles.eyeButton}
-            onPress={() => setShowConfirm(!showConfirm)}
-          >
-            <Ionicons
-              name={showConfirm ? "eye-off" : "eye"}
-              size={22}
-              color="#7A5C47"
-            />
-          </TouchableOpacity>
-        </View>
+            {/* Barra de força */}
+            <View style={styles.strengthBar}>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <View
+                  key={i}
+                  style={[
+                    styles.strengthSegment,
+                    { backgroundColor: passStrength >= i ? "#4CAF50" : "#D0BFAF" },
+                  ]}
+                />
+              ))}
+            </View>
 
-        <TouchableOpacity style={styles.saveButton} onPress={alterarSenha}>
-          <Text style={styles.saveText}>Alterar senha</Text>
-        </TouchableOpacity>
-      </View>
-    </Animated.View>
+            {/* Confirmar senha */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="Confirmar nova senha"
+                secureTextEntry={!showConfirm}
+                style={styles.input}
+                value={confirmPass}
+                onChangeText={setConfirmPass}
+              />
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setShowConfirm(!showConfirm)}
+              >
+                <Ionicons
+                  name={showConfirm ? "eye-off" : "eye"}
+                  size={22}
+                  color="#7A5C47"
+                />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity style={styles.saveButton} onPress={alterarSenha}>
+              <Text style={styles.saveText}>Alterar senha</Text>
+            </TouchableOpacity>
+          </View>
+
+        </Animated.View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

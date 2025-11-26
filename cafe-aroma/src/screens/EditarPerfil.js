@@ -35,7 +35,6 @@ export default function EditarPerfil() {
     }).start();
   }, []);
 
-  // Atualiza os campos caso o contexto carregue depois
   useEffect(() => {
     setName(user?.name || "");
     setEmail(user?.email || "");
@@ -119,8 +118,13 @@ export default function EditarPerfil() {
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
     >
-      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 40 }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
         <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
 
           <Text style={styles.title}>Editar Perfil</Text>
