@@ -36,18 +36,209 @@ export default function HomeApp() {
 
   /* ---------------------------- Produtos ---------------------------- */
   const produtos = [
-  { id: 1, nome: 'Cappuccino Tradicional', preco: 12.90, imagem: require('../../assets/cards/cafe.png') },
-  { id: 2, nome: 'Pão Caseiro', preco: 8.50, imagem: require('../../assets/cards/paes.png') },
-  { id: 3, nome: 'Brownie', preco: 6.90, imagem: require('../../assets/cards/doces.png') },
-  { id: 4, nome: 'Café & Croissant Especial', preco: 15.00, imagem: require('../../assets/cards/promo.png') },
-  { id: 5, nome: 'Croissant Manteiga', preco: 7.90, imagem: require('../../assets/cards/croissant.png') },
-  { id: 6, nome: 'Café Moído Especial', preco: 19.90, imagem: require('../../assets/cards/cafe2.png') },
-  { id: 7, nome: 'Bolo Caseiro', preco: 9.50, imagem: require('../../assets/cards/bolo.png') },
-  { id: 8, nome: 'Torta de limão', preco: 22.90, imagem: require('../../assets/cards/tortalimao.png') },
-  { id: 9, nome: 'Expresso Rápido', preco: 7.50, imagem: require('../../assets/cards/expresso.png') },
-  { id: 10, nome: 'Sanduíche Natural', preco: 13.50, imagem: require('../../assets/cards/sanduiche.png') },
-  { id: 11, nome: 'Torrada Especial', preco: 5.90, imagem: require('../../assets/cards/torrada.png') },
-  { id: 12, nome: 'Suco Natural', preco: 6.90, imagem: require('../../assets/cards/suco.png') },
+  {
+    id: 1,
+    nome: 'Cappuccino Tradicional',
+    preco: 12.90,
+    imagem: require('../../assets/cards/cafe.png'),
+    info: {
+      descricao: "Um cappuccino clássico, cremoso e equilibrado entre café, leite e espuma artesanal.",
+      caracteristicas: [
+        "Feito com café selecionado",
+        "Espuma densa e cremosa",
+        "Ideal para manhãs e tardes"
+      ],
+      origem: "Brasil — Serra da Mantiqueira",
+      peso: "300ml"
+    }
+  },
+
+  {
+    id: 2,
+    nome: 'Pão Caseiro',
+    preco: 8.50,
+    imagem: require('../../assets/cards/paes.png'),
+    info: {
+      descricao: "Pão artesanal feito com fermentação natural e ingredientes frescos.",
+      caracteristicas: [
+        "Massa leve e macia",
+        "Casca crocante",
+        "Fermentação natural de 24h"
+      ],
+      origem: "Produção local",
+      peso: "450g"
+    }
+  },
+
+  {
+    id: 3,
+    nome: 'Brownie de Chocolate',
+    preco: 6.90,
+    imagem: require('../../assets/cards/doces.png'),
+    info: {
+      descricao: "Brownie artesanal com chocolate meio amargo e textura densa.",
+      caracteristicas: [
+        "Chocolate 50%",
+        "Produção diária",
+        "Sem conservantes"
+      ],
+      origem: "Brasil",
+      peso: "120g"
+    }
+  },
+
+  {
+    id: 4,
+    nome: 'Cookie Artesanal',
+    preco: 15.00,
+    imagem: require('../../assets/cards/cookieartesanal.png'),
+    info: {
+      descricao: "Cookie crocante por fora e macio por dentro, com gotas de chocolate.",
+      caracteristicas: [
+        "Chocolate 40%",
+        "Massa amanteigada",
+        "Assado na hora"
+      ],
+      origem: "Brasil",
+      peso: "90g"
+    }
+  },
+
+  {
+    id: 5,
+    nome: 'Croissant Manteiga',
+    preco: 7.90,
+    imagem: require('../../assets/cards/croissant.png'),
+    info: {
+      descricao: "Croissant leve e folhado, feito com manteiga francesa.",
+      caracteristicas: [
+        "Camadas delicadas",
+        "Sabor amanteigado",
+        "Assado diariamente"
+      ],
+      origem: "França (receita tradicional)",
+      peso: "65g"
+    }
+  },
+
+  {
+    id: 6,
+    nome: 'Café Moído Especial',
+    preco: 19.90,
+    imagem: require('../../assets/cards/cafe2.png'),
+    info: {
+      descricao: "Café especial com notas aromáticas e torra média.",
+      caracteristicas: [
+        "Torra média",
+        "100% arábica",
+        "Moído na hora"
+      ],
+      origem: "Minas Gerais",
+      peso: "250g"
+    }
+  },
+
+  {
+    id: 7,
+    nome: 'Bolo Caseiro',
+    preco: 9.50,
+    imagem: require('../../assets/cards/bolo.png'),
+    info: {
+      descricao: "Bolo simples e macio, com sabor tradicional de casa de vó.",
+      caracteristicas: [
+        "Textura fofinha",
+        "Levemente doce",
+        "Ideal com café"
+      ],
+      origem: "Produção artesanal",
+      peso: "100g por fatia"
+    }
+  },
+
+  {
+    id: 8,
+    nome: 'Torta de limão',
+    preco: 22.90,
+    imagem: require('../../assets/cards/tortalimao.png'),
+    info: {
+      descricao: "Torta de limão cremosa com base crocante e cobertura merengada.",
+      caracteristicas: [
+        "Sabor cítrico equilibrado",
+        "Merengue queimado",
+        "Base de biscoito"
+      ],
+      origem: "Brasil",
+      peso: "600g"
+    }
+  },
+
+  {
+    id: 9,
+    nome: 'Expresso Rápido',
+    preco: 7.50,
+    imagem: require('../../assets/cards/expresso.png'),
+    info: {
+      descricao: "Café expresso forte e aromático, preparado na hora.",
+      caracteristicas: [
+        "Extração rápida",
+        "Corpo intenso",
+        "Sabor marcante"
+      ],
+      origem: "Brasil",
+      peso: "50ml"
+    }
+  },
+
+  {
+    id: 10,
+    nome: 'Sanduíche Natural',
+    preco: 13.50,
+    imagem: require('../../assets/cards/sanduiche.png'),
+    info: {
+      descricao: "Sanduíche leve com frango, cenoura, maionese e pão integral.",
+      caracteristicas: [
+        "Ingredientes frescos",
+        "Pão integral",
+        "Baixo teor calórico"
+      ],
+      origem: "Produção própria",
+      peso: "180g"
+    }
+  },
+
+  {
+    id: 11,
+    nome: 'Torrada Especial',
+    preco: 5.90,
+    imagem: require('../../assets/cards/torrada.png'),
+    info: {
+      descricao: "Torradas crocantes feitas com pão especial artesanal.",
+      caracteristicas: [
+        "Crocrância intensa",
+        "Ideal para café",
+        "Sem aditivos"
+      ],
+      origem: "Produção local",
+      peso: "120g"
+    }
+  },
+
+  {
+    id: 12,
+    nome: 'Suco Natural',
+    preco: 6.90,
+    imagem: require('../../assets/cards/suco.png'),
+    info: {
+      descricao: "Suco natural feito com frutas frescas da estação.",
+      caracteristicas: [
+        "Sem açúcar",
+        "100% fruta",
+        "Feito na hora"
+      ],
+      origem: "Brasil",
+      peso: "300ml"
+    }
+  },
 ];
 
     /* ---------------------------- CARROSSEL ---------------------------- */
@@ -57,12 +248,12 @@ export default function HomeApp() {
       id: 'promo1',
       title: 'Cappuccino Tradicional',
       price: 12.90,
-      img: require('../../assets/cards/cafe.png'),
+      img: require('../../assets/cards/paes.png'),
       nav: {
         id: 1,
         nome: 'Cappuccino Tradicional',
         preco: 12.90,
-        imagem: require('../../assets/cards/cafe.png'),
+        imagem: require('../../assets/cards/paes.png'),
         descricao: "Um cappuccino clássico com equilíbrio perfeito entre café, leite e espuma.",
       }
     },
@@ -70,12 +261,12 @@ export default function HomeApp() {
       id: 'promo2',
       title: 'Pão Caseiro',
       price: 8.50,
-      img: require('../../assets/cards/paes.png'),
+      img: require('../../assets/cards/banner.png'),
       nav: {
         id: 2,
         nome: 'Pão Caseiro',
         preco: 8.50,
-        imagem: require('../../assets/cards/paes.png'),
+        imagem: require('../../assets/cards/banner.png'),
         descricao: "Pão artesanal feito com ingredientes frescos e fermentação natural.",
       }
     },
@@ -204,7 +395,7 @@ export default function HomeApp() {
 
   /* ---------------------------- MAIN ---------------------------- */
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: 5 }]}>
       <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
 
       {/* HEADER */}

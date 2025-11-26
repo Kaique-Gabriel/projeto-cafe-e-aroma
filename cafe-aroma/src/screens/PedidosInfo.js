@@ -6,32 +6,53 @@ import theme from '../theme/theme';
 export default function PedidosInfo({ route }) {
   const { item } = route.params;
 
+  const info = item.info || {}; // ← GARANTE QUE SEMPRE EXISTE
+
   return (
-    <ScrollView style={styles.container}>
-      <Image source={item.imagem} style={styles.image} />
+    <ScrollView style={styles.container}
+      contentContainerStyle={{ paddingBottom: 40 }} // EVITA NAVBAR COMER A UI
+>
+      {item.imagem && (
+        <Image source={item.imagem} style={styles.image} />
+      )}
 
       <Text style={styles.title}>{item.nome}</Text>
-      <Text style={styles.price}>R$ {item.preco.toFixed(2)}</Text>
 
-      <Text style={styles.section}>Informações do Produto</Text>
-      <Text style={styles.description}>{item.info.descricao}</Text>
+      {item.preco !== undefined && (
+        <Text style={styles.price}>R$ {Number(item.preco).toFixed(2)}</Text>
+      )}
 
-      <Text style={styles.section}>Características</Text>
-      {item.info.caracteristicas.map((c, index) => (
-        <Text key={index} style={styles.listItem}>• {c}</Text>
-      ))}
-
-      {item.info.origem && (
+      {/* DESCRIÇÃO */}
+      {info.descricao && (
         <>
-          <Text style={styles.section}>Origem</Text>
-          <Text style={styles.description}>{item.info.origem}</Text>
+          <Text style={styles.section}>Informações do Produto</Text>
+          <Text style={styles.description}>{info.descricao}</Text>
         </>
       )}
 
-      {item.info.peso && (
+      {/* CARACTERÍSTICAS */}
+      {Array.isArray(info.caracteristicas) && info.caracteristicas.length > 0 && (
+        <>
+          <Text style={styles.section}>Características</Text>
+          {info.caracteristicas.map((c, index) => (
+            <Text key={index} style={styles.listItem}>• {c}</Text>
+          ))}
+        </>
+      )}
+
+      {/* ORIGEM */}
+      {info.origem && (
+        <>
+          <Text style={styles.section}>Origem</Text>
+          <Text style={styles.description}>{info.origem}</Text>
+        </>
+      )}
+
+      {/* PESO */}
+      {info.peso && (
         <>
           <Text style={styles.section}>Peso / Quantidade</Text>
-          <Text style={styles.description}>{item.info.peso}</Text>
+          <Text style={styles.description}>{info.peso}</Text>
         </>
       )}
     </ScrollView>

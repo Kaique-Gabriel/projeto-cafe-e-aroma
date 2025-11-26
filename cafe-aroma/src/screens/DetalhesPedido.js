@@ -48,7 +48,9 @@ export default function DetalhesPedido({ route, navigation }) {
       {/* -------- HEADER -------- */}
  
 
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.container}
+        contentContainerStyle={{ paddingBottom: 40 }} // EVITA NAVBAR COMER A UI
+>
 
         {/* -------- IMAGEM DO PRODUTO -------- */}
         <Image source={imagem} style={styles.image} />

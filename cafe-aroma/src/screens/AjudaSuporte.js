@@ -4,7 +4,9 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function AjudaSuporte({ navigation }) {
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container}
+      contentContainerStyle={{ paddingBottom: 40 }} // EVITA NAVBAR COMER A UI
+>
       
       <Text style={styles.headerTitle}>Central de Ajuda</Text>
       <Text style={styles.subtitle}>

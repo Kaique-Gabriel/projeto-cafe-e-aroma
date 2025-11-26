@@ -4,7 +4,9 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function SobreApp() {
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container}
+      contentContainerStyle={{ paddingBottom: 40 }} // EVITA NAVBAR COMER A UI
+>
 
       {/* Header */}
       <View style={styles.logoArea}>

@@ -13,12 +13,15 @@ import Pedidos from './src/screens/Pedidos';
 import Perfil from './src/screens/Perfil';
 import DetalhesPedido from './src/screens/DetalhesPedido';
 import Carrinho from './src/screens/Carrinho';
-
+import PedidosInfo from './src/screens/PedidosInfo';
 import EditarPerfil from './src/screens/EditarPerfil';
 import Seguranca from './src/screens/Seguranca';
 import SobreApp from './src/screens/SobreApp';
 import Favoritos from './src/screens/Favoritos';
 import AjudaSuporte from './src/screens/AjudaSuporte';
+
+// 🔥 Tela adicionada para o 2FA
+import Codigo2FA from './src/screens/Codigo2FA';
 
 // Drawer customizado
 import DrawerCustom from './src/components/Drawer';
@@ -43,7 +46,7 @@ const LightCoffeeTheme = {
     card: '#F1E4D8',
     text: '#4A2C2A',
     border: '#D5C6B8',
-    primary: '#C78C65', 
+    primary: '#C78C65',
   },
 };
 
@@ -92,6 +95,9 @@ function AppNavigation() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Cadastro" component={Cadastro} />
 
+        {/* 🔥 Tela do 2FA */}
+        <Stack.Screen name="Codigo2FA" component={Codigo2FA} />
+
         {/* Drawer */}
         <Stack.Screen name="MainApp" component={MainDrawer} />
 
@@ -101,6 +107,11 @@ function AppNavigation() {
           component={DetalhesPedido}
           options={{ title: 'Detalhes do Pedido', headerShown: true }}
         />
+        <Stack.Screen
+  name="PedidosInfo"
+  component={PedidosInfo}
+  options={{ title: 'Informações do Pedido', headerShown: true }}
+/>
 
         <Stack.Screen
           name="EditarPerfil"

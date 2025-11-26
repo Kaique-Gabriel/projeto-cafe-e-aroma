@@ -87,29 +87,6 @@ export default function Drawer({ navigation }) {
       </View>
 
       {/* 🔘 BOTÃO ALTERAR TEMA */}
-      <TouchableOpacity
-        onPress={toggleTheme}
-        style={{
-          marginTop: 30,
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingVertical: 14,
-          paddingHorizontal: 20,
-          borderTopWidth: 0.6,
-          borderBottomWidth: 0.6,
-          borderColor: colors.itemBorder,
-        }}
-      >
-        <MaterialCommunityIcons
-          name={isDarkMode ? 'white-balance-sunny' : 'moon-waning-crescent'}
-          size={26}
-          color={colors.itemIcon}
-        />
-
-        <Text style={{ fontSize: 18, marginLeft: 12, color: colors.itemText }}>
-          {isDarkMode ? 'Tema Claro' : 'Tema Escuro'}
-        </Text>
-      </TouchableOpacity>
 
       {/* BOTÃO SAIR */}
       <TouchableOpacity
