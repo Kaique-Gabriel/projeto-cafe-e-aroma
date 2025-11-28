@@ -9,14 +9,18 @@ import {
   Platform,
   ScrollView,
   Animated,
-  Alert,
+  Modal
 } from 'react-native';
+
+import { cadastrarUsuario, getUsuarioPorEmail } from '../utils/Auth';
 
 export default function Cadastro({ navigation }) {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmSenha, setConfirmSenha] = useState('');
+
+  const [modalVisible, setModalVisible] = useState(false);
 
   const fadeLogo = useRef(new Animated.Value(0)).current;
   const fadeContent = useRef(new Animated.Value(0)).current;
@@ -36,38 +40,39 @@ export default function Cadastro({ navigation }) {
     ]).start();
   }, []);
 
-  function validarCadastro() {
-    if (!nome.trim()) {
-      return Alert.alert("Ops!", "Por favor, insira seu nome.");
-    }
+  async function validarCadastro() {
+    if (!nome.trim()) return showError("Por favor, insira seu nome.");
+    if (!email.includes('@') || !email.includes('.'))
+      return showError("Digite um e-mail válido.");
+    if (senha.length < 6)
+      return showError("A senha deve ter ao menos 6 caracteres.");
+    if (senha !== confirmSenha)
+      return showError("As senhas não coincidem.");
 
-    if (!email.includes('@') || !email.includes('.')) {
-      return Alert.alert("Email inválido", "Digite um email válido.");
-    }
+    const existente = await getUsuarioPorEmail(email);
 
-    if (senha.length < 6) {
-      return Alert.alert("Senha fraca", "A senha deve ter pelo menos 6 caracteres.");
-    }
+    if (existente) return showError("Já existe uma conta com esse e-mail.");
 
-    if (senha !== confirmSenha) {
-      return Alert.alert("Senhas diferentes", "As senhas não coincidem.");
-    }
+    const ok = await cadastrarUsuario(nome, email, senha);
 
-    navigation.navigate('MainApp');
+    if (ok) {
+      setModalVisible(true);
+    } else {
+      showError("Erro inesperado ao cadastrar. Tente novamente.");
+    }
+  }
+
+  function showError(msg) {
+    return alert(msg);
   }
 
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0} 
     >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-
+      <ScrollView contentContainerStyle={styles.container}>
+        
         <Animated.Image
           source={require('../../assets/images/icons/logo.png')}
           style={[styles.logo, { opacity: fadeLogo }]}
@@ -76,7 +81,7 @@ export default function Cadastro({ navigation }) {
 
         <Animated.View style={{ width: '100%', opacity: fadeContent }}>
           <Text style={styles.title}>Criar Conta</Text>
-          <Text style={styles.subtitle}>Cadastre-se e comece a aproveitar ☕</Text>
+          <Text style={styles.subtitle}>Cadastre-se e aproveite ☕</Text>
 
           <TextInput
             style={styles.input}
@@ -90,8 +95,8 @@ export default function Cadastro({ navigation }) {
             placeholder="Email"
             value={email}
             onChangeText={setEmail}
-            keyboardType="email-address"
             autoCapitalize="none"
+            keyboardType="email-address"
           />
 
           <TextInput
@@ -110,22 +115,39 @@ export default function Cadastro({ navigation }) {
             secureTextEntry
           />
 
-          <TouchableOpacity
-            style={styles.btnPrimary}
-            activeOpacity={0.8}
-            onPress={validarCadastro}
-          >
+          <TouchableOpacity style={styles.btnPrimary} onPress={validarCadastro}>
             <Text style={styles.btnPrimaryText}>Criar Conta</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.btnSecondary}
             onPress={() => navigation.navigate('Welcome')}
-            activeOpacity={0.8}
           >
             <Text style={styles.btnSecondaryText}>Voltar</Text>
           </TouchableOpacity>
         </Animated.View>
+
+        {/* MODAL SUCESSO */}
+        <Modal visible={modalVisible} transparent animationType="fade">
+          <View style={styles.modalBackground}>
+            <View style={styles.modalBox}>
+              <Text style={styles.modalTitle}>Conta criada!</Text>
+              <Text style={styles.modalText}>
+                Sua conta foi criada com sucesso ☕✨
+              </Text>
+
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => {
+                  setModalVisible(false);
+                  navigation.navigate('Login');
+                }}
+              >
+                <Text style={styles.modalButtonText}>Ir para Login</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
       </ScrollView>
     </KeyboardAvoidingView>
@@ -140,14 +162,11 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#F6EFE7",
   },
-
   logo: {
     width: 180,
     height: 180,
-    alignSelf: "center",
     marginBottom: 10,
   },
-
   title: {
     fontSize: 28,
     fontWeight: "700",
@@ -155,14 +174,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 4,
   },
-
   subtitle: {
     fontSize: 15,
     color: "#7A5C47",
     textAlign: "center",
     marginBottom: 20,
   },
-
   input: {
     backgroundColor: "#FFF",
     width: "100%",
@@ -173,7 +190,6 @@ const styles = StyleSheet.create({
     borderColor: "#C7B39A",
     fontSize: 15,
   },
-
   btnPrimary: {
     backgroundColor: "#6A4A3C",
     paddingVertical: 16,
@@ -181,22 +197,59 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
   },
-
   btnPrimaryText: {
     color: "#FFF",
     fontSize: 17,
     fontWeight: "700",
   },
-
   btnSecondary: {
     marginTop: 14,
     paddingVertical: 14,
     alignItems: "center",
   },
-
   btnSecondaryText: {
     color: "#6A4A3C",
     fontSize: 15,
     fontWeight: "600",
+  },
+
+  // MODAL
+  modalBackground: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalBox: {
+    width: "80%",
+    backgroundColor: "#FFF8F1",
+    padding: 25,
+    borderRadius: 20,
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#D8C2A8",
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#4C2E1E",
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    color: "#6A4A3C",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  modalButton: {
+    backgroundColor: "#6A4A3C",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+  },
+  modalButtonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "700",
   },
 });

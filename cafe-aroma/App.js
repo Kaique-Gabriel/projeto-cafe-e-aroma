@@ -31,6 +31,8 @@ import { AppProvider, useApp } from './src/context/AppContext';
 import { CarrinhoProvider } from './src/context/CarrinhoContext';
 import { UserProvider } from './src/context/UserContext';
 import { FavoritosProvider } from './src/context/FavoritosContext';
+import { PedidosProvider } from './src/context/PedidosContext';
+
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -157,7 +159,9 @@ export default function App() {
       <AppProvider>
         <CarrinhoProvider>
           <FavoritosProvider>
+            <PedidosProvider>
             <AppNavigation />
+            </PedidosProvider>
           </FavoritosProvider>
         </CarrinhoProvider>
       </AppProvider>

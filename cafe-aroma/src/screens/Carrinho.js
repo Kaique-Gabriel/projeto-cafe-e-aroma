@@ -1,6 +1,10 @@
+// src/screens/Carrinho.js
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
 import { CarrinhoContext } from '../context/CarrinhoContext';
+
+// 🔥 IMPORT NECESSÁRIO
+import { PedidosContext } from '../context/PedidosContext';
 
 export default function Carrinho({ navigation }) {
 
@@ -12,6 +16,23 @@ export default function Carrinho({ navigation }) {
     limparCarrinho,
     total
   } = useContext(CarrinhoContext);
+
+  const { adicionarPedido } = useContext(PedidosContext); // 🔥 agora funciona
+
+  function finalizarCompra() {
+    if (carrinho.length === 0) return;
+
+    const pedido = {
+      id: Date.now(),
+      itens: carrinho,
+      total,
+      data: new Date().toLocaleString(),
+    };
+
+    adicionarPedido(pedido);   // 🔥 envia corretamente
+    limparCarrinho();
+    navigation.navigate("Pedidos"); // 🔥 navega corretamente
+  }
 
   return (
     <View style={styles.container}>
@@ -40,8 +61,7 @@ export default function Carrinho({ navigation }) {
             contentContainerStyle={{ paddingBottom: 20 }}
             renderItem={({ item }) => (
               <View style={styles.itemContainer}>
-                
-                {/* Nome + Preço */}
+
                 <View style={{ flex: 1 }}>
                   <Text style={styles.nome}>{item.nome}</Text>
                   <Text style={styles.preco}>
@@ -49,7 +69,6 @@ export default function Carrinho({ navigation }) {
                   </Text>
                 </View>
 
-                {/* Controles de Quantidade */}
                 <View style={styles.quantidadeContainer}>
                   <TouchableOpacity onPress={() => removerItem(item.id)} style={styles.quantidadeBotao}>
                     <Text style={styles.quantidadeTexto}>-</Text>
@@ -62,7 +81,6 @@ export default function Carrinho({ navigation }) {
                   </TouchableOpacity>
                 </View>
 
-                {/* Remover item */}
                 <TouchableOpacity onPress={() => removerItemCompleto(item.id)}>
                   <Text style={styles.removerTexto}>Remover</Text>
                 </TouchableOpacity>
@@ -70,14 +88,10 @@ export default function Carrinho({ navigation }) {
             )}
           />
 
-          {/* Footer */}
-          <View style={styles.footer}>
+          <View className={styles.footer}>
             <Text style={styles.totalTexto}>Total: R$ {total.toFixed(2)}</Text>
 
-            <TouchableOpacity
-              style={styles.finalizarBotao}
-              onPress={() => alert("Compra finalizada!")}
-            >
+            <TouchableOpacity style={styles.finalizarBotao} onPress={finalizarCompra}>
               <Text style={styles.finalizarTexto}>Finalizar Pedido</Text>
             </TouchableOpacity>
           </View>
@@ -87,122 +101,24 @@ export default function Carrinho({ navigation }) {
   );
 }
 
-
-/* =====================================================
-   ESTILOS
-===================================================== */
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FAF3E7',
-    paddingHorizontal: 16,
-    paddingTop: 20,
-  },
-
-  titulo: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#4E342E',
-    marginBottom: 10,
-  },
-
-  /* Carrinho vazio */
-  vazioContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  vazioTexto: {
-    fontSize: 18,
-    color: '#6D4C41',
-    marginTop: 10,
-  },
-  botaoVoltar: {
-    marginTop: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    backgroundColor: '#4E342E',
-    borderRadius: 10,
-  },
-  botaoVoltarTexto: {
-    color: '#fff',
-    fontSize: 16,
-  },
-
-  /* Item */
-  itemContainer: {
-    backgroundColor: '#FFF',
-    padding: 14,
-    marginVertical: 6,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    elevation: 3,
-  },
-  nome: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#3E2723',
-  },
-  preco: {
-    fontSize: 16,
-    color: '#6D4C41',
-    marginTop: 4,
-  },
-
-  /* Quantidade */
-  quantidadeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  quantidadeBotao: {
-    width: 30,
-    height: 30,
-    borderRadius: 8,
-    backgroundColor: '#EFEBE9',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  quantidadeTexto: {
-    fontSize: 20,
-    color: '#4E342E',
-  },
-  quantidadeNumero: {
-    fontSize: 18,
-    marginHorizontal: 10,
-    color: '#4E342E',
-  },
-
-  removerTexto: {
-    color: '#B71C1C',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-
-  /* Footer */
-  footer: {
-    padding: 16,
-    backgroundColor: '#FFF3E0',
-    borderTopWidth: 1,
-    borderColor: '#E0C3A0',
-  },
-  totalTexto: {
-    fontSize: 20,
-    color: '#4E342E',
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  finalizarBotao: {
-    backgroundColor: '#4E342E',
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  finalizarTexto: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+  /* SEUS ESTILOS MANTIDOS */
+  container: { flex: 1, backgroundColor: '#FAF3E7', paddingHorizontal: 16, paddingTop: 20 },
+  titulo: { fontSize: 28, fontWeight: '700', color: '#4E342E', marginBottom: 10 },
+  vazioContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  vazioTexto: { fontSize: 18, color: '#6D4C41', marginTop: 10 },
+  botaoVoltar: { marginTop: 20, paddingHorizontal: 20, paddingVertical: 10, backgroundColor: '#4E342E', borderRadius: 10 },
+  botaoVoltarTexto: { color: '#fff', fontSize: 16 },
+  itemContainer: { backgroundColor: '#FFF', padding: 14, marginVertical: 6, borderRadius: 12, flexDirection: 'row', alignItems: 'center', elevation: 3 },
+  nome: { fontSize: 18, fontWeight: 'bold', color: '#3E2723' },
+  preco: { fontSize: 16, color: '#6D4C41', marginTop: 4 },
+  quantidadeContainer: { flexDirection: 'row', alignItems: 'center', marginRight: 12 },
+  quantidadeBotao: { width: 30, height: 30, borderRadius: 8, backgroundColor: '#EFEBE9', justifyContent: 'center', alignItems: 'center' },
+  quantidadeTexto: { fontSize: 20, color: '#4E342E' },
+  quantidadeNumero: { fontSize: 18, marginHorizontal: 10, color: '#4E342E' },
+  removerTexto: { color: '#B71C1C', fontSize: 14, fontWeight: 'bold' },
+  footer: { padding: 16, backgroundColor: '#FFF3E0', borderTopWidth: 1, borderColor: '#E0C3A0' },
+  totalTexto: { fontSize: 20, color: '#4E342E', fontWeight: 'bold', marginBottom: 10 },
+  finalizarBotao: { backgroundColor: '#4E342E', paddingVertical: 12, borderRadius: 12, alignItems: 'center' },
+  finalizarTexto: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
 });

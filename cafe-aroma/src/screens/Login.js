@@ -15,13 +15,14 @@ import {
   ScrollView
 } from 'react-native';
 
+import { loginUsuario } from '../utils/Auth'; // <-- usa a função de validação do Auth
+
 export default function Login({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const [error, setError] = useState('');
-  const fadeError = useRef(new Animated.Value(0)).current;
 
+  const fadeError = useRef(new Animated.Value(0)).current;
   const fadeLogo = useRef(new Animated.Value(0)).current;
   const fadeContent = useRef(new Animated.Value(0)).current;
 
@@ -40,7 +41,20 @@ export default function Login({ navigation }) {
     ]).start();
   }, []);
 
-  const validarLogin = () => {
+  const mostrarErro = (msg) => {
+    setError(msg);
+    Vibration.vibrate(50);
+
+    fadeError.setValue(0);
+    Animated.timing(fadeError, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // VALIDAÇÃO com async/await usando loginUsuario do Auth.js
+  const validarLogin = async () => {
     setError('');
 
     if (!email.trim() || !password.trim()) {
@@ -52,23 +66,22 @@ export default function Login({ navigation }) {
       return mostrarErro('Digite um email válido.');
     }
 
-    if (password.length < 6) {
-      return mostrarErro('A senha deve ter ao menos 6 caracteres.');
+    try {
+      const res = await loginUsuario(email.trim(), password);
+      if (!res.ok) {
+        // res.msg vem do Auth.js (ex: "Email não encontrado." / "Senha incorreta.")
+        return mostrarErro(res.msg || 'Erro ao logar.');
+      }
+
+      // Login OK → seguir para 2FA (mantendo seu fluxo)
+      navigation.navigate('Codigo2FA', { email: email.trim() });
+
+      // Se prefirar pular 2FA e ir direto para o app:
+      // navigation.reset({ index: 0, routes: [{ name: 'MainApp' }] });
+    } catch (e) {
+      console.error('validarLogin error:', e);
+      mostrarErro('Erro inesperado. Tente novamente.');
     }
-
-    navigation.navigate('Codigo2FA', { email });
-  };
-
-  const mostrarErro = (msg) => {
-    setError(msg);
-    Vibration.vibrate(50);
-
-    fadeError.setValue(0);
-    Animated.timing(fadeError, {
-      toValue: 1,
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
   };
 
   return (
@@ -93,10 +106,7 @@ export default function Login({ navigation }) {
             <Text style={styles.subtitle}>Acesse sua conta para continuar ☕</Text>
 
             <TextInput
-              style={[
-                styles.input,
-                error && !email ? { borderColor: '#B71C1C' } : null,
-              ]}
+              style={[styles.input]}
               placeholder="Email"
               value={email}
               onChangeText={setEmail}
@@ -105,10 +115,7 @@ export default function Login({ navigation }) {
             />
 
             <TextInput
-              style={[
-                styles.input,
-                error && !password ? { borderColor: '#B71C1C' } : null,
-              ]}
+              style={[styles.input]}
               placeholder="Senha"
               value={password}
               onChangeText={setPassword}
