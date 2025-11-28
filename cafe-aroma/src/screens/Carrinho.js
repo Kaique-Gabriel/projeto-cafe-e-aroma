@@ -17,21 +17,17 @@ export default function Carrinho({ navigation }) {
     total
   } = useContext(CarrinhoContext);
 
-  const { adicionarPedido } = useContext(PedidosContext); // 🔥 agora funciona
+  // ⛔ NÃO vamos finalizar direto
+  // const { adicionarPedido } = useContext(PedidosContext);
 
-  function finalizarCompra() {
+  function irParaEndereco() {
     if (carrinho.length === 0) return;
 
-    const pedido = {
-      id: Date.now(),
-      itens: carrinho,
-      total,
-      data: new Date().toLocaleString(),
-    };
-
-    adicionarPedido(pedido);   // 🔥 envia corretamente
-    limparCarrinho();
-    navigation.navigate("Pedidos"); // 🔥 navega corretamente
+    // Vamos enviar os dados do carrinho para a tela de Endereço
+    navigation.navigate("EnderecoEntrega", {
+      carrinho,
+      total
+    });
   }
 
   return (
@@ -88,11 +84,11 @@ export default function Carrinho({ navigation }) {
             )}
           />
 
-          <View className={styles.footer}>
+          <View style={styles.footer}>
             <Text style={styles.totalTexto}>Total: R$ {total.toFixed(2)}</Text>
 
-            <TouchableOpacity style={styles.finalizarBotao} onPress={finalizarCompra}>
-              <Text style={styles.finalizarTexto}>Finalizar Pedido</Text>
+            <TouchableOpacity style={styles.finalizarBotao} onPress={irParaEndereco}>
+              <Text style={styles.finalizarTexto}>Prosseguir para Endereço</Text>
             </TouchableOpacity>
           </View>
         </>
@@ -102,7 +98,6 @@ export default function Carrinho({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  /* SEUS ESTILOS MANTIDOS */
   container: { flex: 1, backgroundColor: '#FAF3E7', paddingHorizontal: 16, paddingTop: 20 },
   titulo: { fontSize: 28, fontWeight: '700', color: '#4E342E', marginBottom: 10 },
   vazioContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },

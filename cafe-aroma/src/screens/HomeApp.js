@@ -1,6 +1,5 @@
-// ---------------- HomeApp.js (VERSÃO ATUALIZADA E FUNCIONAL) ----------------
-
-import React, { useRef, useEffect, useContext } from 'react';
+// src/screens/HomeApp.js
+import React, { useRef, useEffect, useContext, useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -11,6 +10,8 @@ import {
   Animated,
   Dimensions,
   StatusBar,
+  TextInput,
+  ImageBackground,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -26,7 +27,8 @@ import theme from '../theme/theme';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 50) / 2;
-const CAROUSEL_HEIGHT = 110;
+const CAROUSEL_HEIGHT = 140; // aumentado um pouco para ficar mais imponente
+const LARGE_CARD_HEIGHT = 150;
 
 export default function HomeApp() {
   const navigation = useNavigation();
@@ -34,215 +36,206 @@ export default function HomeApp() {
   const { favoritos, toggleFavorito, isFavorito } = useFavoritos();
   const { adicionarItem } = useContext(CarrinhoContext);
 
+  const [activeSection, setActiveSection] = useState('unitarios'); // 'unitarios' | 'combos' | 'cestas'
+  const [search, setSearch] = useState('');
+
   /* ---------------------------- Produtos ---------------------------- */
   const produtos = [
-  {
-    id: 1,
-    nome: 'Cappuccino Tradicional',
-    preco: 12.90,
-    imagem: require('../../assets/cards/cafe.png'),
-    info: {
-      descricao: "Um cappuccino clássico, cremoso e equilibrado entre café, leite e espuma artesanal.",
-      caracteristicas: [
-        "Feito com café selecionado",
-        "Espuma densa e cremosa",
-        "Ideal para manhãs e tardes"
-      ],
-      origem: "Brasil — Serra da Mantiqueira",
-      peso: "300ml"
-    }
-  },
+    {
+      id: 1,
+      nome: 'Cappuccino Tradicional',
+      preco: 12.90,
+      imagem: require('../../assets/cards/cafe.png'),
+      info: {
+        descricao: "Um cappuccino clássico, cremoso e equilibrado entre café, leite e espuma artesanal.",
+        caracteristicas: [
+          "Feito com café selecionado",
+          "Espuma densa e cremosa",
+          "Ideal para manhãs e tardes"
+        ],
+        origem: "Brasil — Serra da Mantiqueira",
+        peso: "300ml"
+      }
+    },
+    {
+      id: 2,
+      nome: 'Pão Caseiro',
+      preco: 8.50,
+      imagem: require('../../assets/cards/paes.png'),
+      info: {
+        descricao: "Pão artesanal feito com fermentação natural e ingredientes frescos.",
+        caracteristicas: [
+          "Massa leve e macia",
+          "Casca crocante",
+          "Fermentação natural de 24h"
+        ],
+        origem: "Produção local",
+        peso: "450g"
+      }
+    },
+    {
+      id: 3,
+      nome: 'Brownie de Chocolate',
+      preco: 6.90,
+      imagem: require('../../assets/cards/doces.png'),
+      info: {
+        descricao: "Brownie artesanal com chocolate meio amargo e textura densa.",
+        caracteristicas: [
+          "Chocolate 50%",
+          "Produção diária",
+          "Sem conservantes"
+        ],
+        origem: "Brasil",
+        peso: "120g"
+      }
+    },
+    {
+      id: 4,
+      nome: 'Cookie Artesanal',
+      preco: 15.00,
+      imagem: require('../../assets/cards/cookieartesanal.png'),
+      info: {
+        descricao: "Cookie crocante por fora e macio por dentro, com gotas de chocolate.",
+        caracteristicas: [
+          "Chocolate 40%",
+          "Massa amanteigada",
+          "Assado na hora"
+        ],
+        origem: "Brasil",
+        peso: "90g"
+      }
+    },
+    {
+      id: 5,
+      nome: 'Croissant Manteiga',
+      preco: 7.90,
+      imagem: require('../../assets/cards/croissant.png'),
+      info: {
+        descricao: "Croissant leve e folhado, feito com manteiga francesa.",
+        caracteristicas: [
+          "Camadas delicadas",
+          "Sabor amanteigado",
+          "Assado diariamente"
+        ],
+        origem: "França (receita tradicional)",
+        peso: "65g"
+      }
+    },
+    {
+      id: 6,
+      nome: 'Café Moído Especial',
+      preco: 19.90,
+      imagem: require('../../assets/cards/cafe2.png'),
+      info: {
+        descricao: "Café especial com notas aromáticas e torra média.",
+        caracteristicas: [
+          "Torra média",
+          "100% arábica",
+          "Moído na hora"
+        ],
+        origem: "Minas Gerais",
+        peso: "250g"
+      }
+    },
+    {
+      id: 7,
+      nome: 'Bolo Caseiro',
+      preco: 9.50,
+      imagem: require('../../assets/cards/bolo.png'),
+      info: {
+        descricao: "Bolo simples e macio, com sabor tradicional de casa de vó.",
+        caracteristicas: [
+          "Textura fofinha",
+          "Levemente doce",
+          "Ideal com café"
+        ],
+        origem: "Produção artesanal",
+        peso: "100g por fatia"
+      }
+    },
+    {
+      id: 8,
+      nome: 'Torta de limão',
+      preco: 22.90,
+      imagem: require('../../assets/cards/tortalimao.png'),
+      info: {
+        descricao: "Torta de limão cremosa com base crocante e cobertura merengada.",
+        caracteristicas: [
+          "Sabor cítrico equilibrado",
+          "Merengue queimado",
+          "Base de biscoito"
+        ],
+        origem: "Brasil",
+        peso: "600g"
+      }
+    },
+    {
+      id: 9,
+      nome: 'Expresso Rápido',
+      preco: 7.50,
+      imagem: require('../../assets/cards/expresso.png'),
+      info: {
+        descricao: "Café expresso forte e aromático, preparado na hora.",
+        caracteristicas: [
+          "Extração rápida",
+          "Corpo intenso",
+          "Sabor marcante"
+        ],
+        origem: "Brasil",
+        peso: "50ml"
+      }
+    },
+    {
+      id: 10,
+      nome: 'Sanduíche Natural',
+      preco: 13.50,
+      imagem: require('../../assets/cards/sanduiche.png'),
+      info: {
+        descricao: "Sanduíche leve com frango, cenoura, maionese e pão integral.",
+        caracteristicas: [
+          "Ingredientes frescos",
+          "Pão integral",
+          "Baixo teor calórico"
+        ],
+        origem: "Produção própria",
+        peso: "180g"
+      }
+    },
+    {
+      id: 11,
+      nome: 'Torrada Especial',
+      preco: 5.90,
+      imagem: require('../../assets/cards/torrada.png'),
+      info: {
+        descricao: "Torradas crocantes feitas com pão especial artesanal.",
+        caracteristicas: [
+          "Crocrância intensa",
+          "Ideal para café",
+          "Sem aditivos"
+        ],
+        origem: "Produção local",
+        peso: "120g"
+      }
+    },
+    {
+      id: 12,
+      nome: 'Suco Natural',
+      preco: 6.90,
+      imagem: require('../../assets/cards/suco.png'),
+      info: {
+        descricao: "Suco natural feito com frutas frescas da estação.",
+        caracteristicas: [
+          "Sem açúcar",
+          "100% fruta",
+          "Feito na hora"
+        ],
+        origem: "Brasil",
+        peso: "300ml"
+      }
+    },
+  ];
 
-  {
-    id: 2,
-    nome: 'Pão Caseiro',
-    preco: 8.50,
-    imagem: require('../../assets/cards/paes.png'),
-    info: {
-      descricao: "Pão artesanal feito com fermentação natural e ingredientes frescos.",
-      caracteristicas: [
-        "Massa leve e macia",
-        "Casca crocante",
-        "Fermentação natural de 24h"
-      ],
-      origem: "Produção local",
-      peso: "450g"
-    }
-  },
-
-  {
-    id: 3,
-    nome: 'Brownie de Chocolate',
-    preco: 6.90,
-    imagem: require('../../assets/cards/doces.png'),
-    info: {
-      descricao: "Brownie artesanal com chocolate meio amargo e textura densa.",
-      caracteristicas: [
-        "Chocolate 50%",
-        "Produção diária",
-        "Sem conservantes"
-      ],
-      origem: "Brasil",
-      peso: "120g"
-    }
-  },
-
-  {
-    id: 4,
-    nome: 'Cookie Artesanal',
-    preco: 15.00,
-    imagem: require('../../assets/cards/cookieartesanal.png'),
-    info: {
-      descricao: "Cookie crocante por fora e macio por dentro, com gotas de chocolate.",
-      caracteristicas: [
-        "Chocolate 40%",
-        "Massa amanteigada",
-        "Assado na hora"
-      ],
-      origem: "Brasil",
-      peso: "90g"
-    }
-  },
-
-  {
-    id: 5,
-    nome: 'Croissant Manteiga',
-    preco: 7.90,
-    imagem: require('../../assets/cards/croissant.png'),
-    info: {
-      descricao: "Croissant leve e folhado, feito com manteiga francesa.",
-      caracteristicas: [
-        "Camadas delicadas",
-        "Sabor amanteigado",
-        "Assado diariamente"
-      ],
-      origem: "França (receita tradicional)",
-      peso: "65g"
-    }
-  },
-
-  {
-    id: 6,
-    nome: 'Café Moído Especial',
-    preco: 19.90,
-    imagem: require('../../assets/cards/cafe2.png'),
-    info: {
-      descricao: "Café especial com notas aromáticas e torra média.",
-      caracteristicas: [
-        "Torra média",
-        "100% arábica",
-        "Moído na hora"
-      ],
-      origem: "Minas Gerais",
-      peso: "250g"
-    }
-  },
-
-  {
-    id: 7,
-    nome: 'Bolo Caseiro',
-    preco: 9.50,
-    imagem: require('../../assets/cards/bolo.png'),
-    info: {
-      descricao: "Bolo simples e macio, com sabor tradicional de casa de vó.",
-      caracteristicas: [
-        "Textura fofinha",
-        "Levemente doce",
-        "Ideal com café"
-      ],
-      origem: "Produção artesanal",
-      peso: "100g por fatia"
-    }
-  },
-
-  {
-    id: 8,
-    nome: 'Torta de limão',
-    preco: 22.90,
-    imagem: require('../../assets/cards/tortalimao.png'),
-    info: {
-      descricao: "Torta de limão cremosa com base crocante e cobertura merengada.",
-      caracteristicas: [
-        "Sabor cítrico equilibrado",
-        "Merengue queimado",
-        "Base de biscoito"
-      ],
-      origem: "Brasil",
-      peso: "600g"
-    }
-  },
-
-  {
-    id: 9,
-    nome: 'Expresso Rápido',
-    preco: 7.50,
-    imagem: require('../../assets/cards/expresso.png'),
-    info: {
-      descricao: "Café expresso forte e aromático, preparado na hora.",
-      caracteristicas: [
-        "Extração rápida",
-        "Corpo intenso",
-        "Sabor marcante"
-      ],
-      origem: "Brasil",
-      peso: "50ml"
-    }
-  },
-
-  {
-    id: 10,
-    nome: 'Sanduíche Natural',
-    preco: 13.50,
-    imagem: require('../../assets/cards/sanduiche.png'),
-    info: {
-      descricao: "Sanduíche leve com frango, cenoura, maionese e pão integral.",
-      caracteristicas: [
-        "Ingredientes frescos",
-        "Pão integral",
-        "Baixo teor calórico"
-      ],
-      origem: "Produção própria",
-      peso: "180g"
-    }
-  },
-
-  {
-    id: 11,
-    nome: 'Torrada Especial',
-    preco: 5.90,
-    imagem: require('../../assets/cards/torrada.png'),
-    info: {
-      descricao: "Torradas crocantes feitas com pão especial artesanal.",
-      caracteristicas: [
-        "Crocrância intensa",
-        "Ideal para café",
-        "Sem aditivos"
-      ],
-      origem: "Produção local",
-      peso: "120g"
-    }
-  },
-
-  {
-    id: 12,
-    nome: 'Suco Natural',
-    preco: 6.90,
-    imagem: require('../../assets/cards/suco.png'),
-    info: {
-      descricao: "Suco natural feito com frutas frescas da estação.",
-      caracteristicas: [
-        "Sem açúcar",
-        "100% fruta",
-        "Feito na hora"
-      ],
-      origem: "Brasil",
-      peso: "300ml"
-    }
-  },
-];
-
-    /* ---------------------------- CARROSSEL ---------------------------- */
-
+  /* ---------------------------- CARROSSEL (usando imagens já existentes) ---------------------------- */
   const promos = [
     {
       id: 'promo1',
@@ -285,11 +278,46 @@ export default function HomeApp() {
     },
   ];
 
+  // Dados para Combos e Cestas (você pode ajustar esses arrays depois)
+  const combos = [
+    {
+      id: 'combo1',
+      nome: 'Combo Café + Pão',
+      preco: 18.90,
+      imagem: require('../../assets/cards/banner.png'),
+      descricao: 'Cappuccino + Pão Caseiro',
+    },
+    {
+      id: 'combo2',
+      nome: 'Combo Doce',
+      preco: 14.50,
+      imagem: require('../../assets/cards/combo.png'),
+      descricao: 'Brownie + Suco Natural',
+    },
+  ];
 
+  const cestas = [
+    {
+      id: 'cesta1',
+      nome: 'Cesta Família',
+      preco: 79.90,
+      imagem: require('../../assets/cards/paes.png'),
+      descricao: 'Cestas com pães, geleias e bebidas.',
+    },
+    {
+      id: 'cesta2',
+      nome: 'Cesta Especial',
+      preco: 109.90,
+      imagem: require('../../assets/cards/combo.png'),
+      descricao: 'Seleção premium para presentear.',
+    },
+  ];
+
+  /* ---------------------------- Animações e refs ---------------------------- */
   const animValues = useRef(produtos.map(() => new Animated.Value(0))).current;
   const scrollX = useRef(new Animated.Value(0)).current;
+  const carouselRef = useRef(null);
 
-  /* ---------------------------- Animação de entrada ---------------------------- */
   useEffect(() => {
     const animations = animValues.map((v, i) =>
       Animated.timing(v, {
@@ -320,29 +348,52 @@ export default function HomeApp() {
     ]).start();
   }
 
-  function handleAddToCart(item, index) {
+  function handleAddToCart(item, index = 0) {
     adicionarItem({
-      id: item.id,
+      id: item.id ?? item.nome,
       nome: item.nome,
-      preco: item.preco,
-      imagem: item.imagem,
+      preco: item.preco ?? item.preco,
+      imagem: item.imagem ?? item.imagem,
     });
-
-    animateCart(index);
+    // animate (only for produtos grid items we pass index)
+    if (typeof index === 'number') {
+      animateCart(index);
+    }
   }
 
   /* ---------------------------- ABRIR DETALHES ---------------------------- */
   function openDetalhes(item) {
-  navigation.navigate("DetalhesPedido", {
-    id: item.id,
-    nome: item.nome,
-    preco: item.preco,
-    imagem: item.imagem,
-    descricao: item.descricao || "Descrição detalhada deste produto ainda não foi informada.",
-  });
-}
+    navigation.navigate("DetalhesPedido", {
+      id: item.id,
+      nome: item.nome,
+      preco: item.preco,
+      imagem: item.imagem,
+      descricao: item.descricao || item.info?.descricao || "Descrição detalhada deste produto ainda não foi informada.",
+    });
+  }
 
-  /* ---------------------------- RENDER PRODUTO ---------------------------- */
+  /* ---------------------------- FILTRAGEM (SEARCH) ---------------------------- */
+  const searchLower = search.trim().toLowerCase();
+
+  const filteredUnitarios = useMemo(() => {
+    if (!searchLower) return produtos;
+    return produtos.filter(p => (p.nome || '').toLowerCase().includes(searchLower) ||
+      (p.info?.descricao || '').toLowerCase().includes(searchLower));
+  }, [produtos, searchLower]);
+
+  const filteredCombos = useMemo(() => {
+    if (!searchLower) return combos;
+    return combos.filter(c => (c.nome || '').toLowerCase().includes(searchLower) ||
+      (c.descricao || '').toLowerCase().includes(searchLower));
+  }, [combos, searchLower]);
+
+  const filteredCestas = useMemo(() => {
+    if (!searchLower) return cestas;
+    return cestas.filter(c => (c.nome || '').toLowerCase().includes(searchLower) ||
+      (c.descricao || '').toLowerCase().includes(searchLower));
+  }, [cestas, searchLower]);
+
+  /* ---------------------------- RENDER PRODUTO (GRID) ---------------------------- */
   const renderProduto = ({ item, index }) => {
     const anim = animValues[index];
     const scale = anim.interpolate({ inputRange: [0, 1], outputRange: [0.95, 1] });
@@ -351,7 +402,6 @@ export default function HomeApp() {
 
     return (
       <Animated.View style={[styles.card, { transform: [{ scale }], opacity: anim }]}>
-
         {/* ❤️ Favorito */}
         <TouchableOpacity style={styles.favBtn} onPress={() => toggleFavorito(item)}>
           <Ionicons
@@ -370,7 +420,6 @@ export default function HomeApp() {
 
         {/* FOOTER */}
         <View style={styles.cardFooter}>
-
           {/* 🛒 Comprar */}
           <TouchableOpacity onPress={() => handleAddToCart(item, index)}>
             <Animated.View style={{ transform: [{ scale: cartAnimations[index] }] }}>
@@ -384,14 +433,53 @@ export default function HomeApp() {
 
           {/* ℹ Info */}
           <TouchableOpacity onPress={() => navigation.navigate("PedidosInfo", { item })}>
-  <Feather name="info" size={22} color={theme.colors.textSecondary} />
-</TouchableOpacity>
-
+            <Feather name="info" size={22} color={theme.colors.textSecondary} />
+          </TouchableOpacity>
         </View>
-
       </Animated.View>
     );
   };
+
+  /* ---------------------------- RENDER LARGE CARD (Combos/Cestas) ---------------------------- */
+  const renderLargeCard = ({ item }) => (
+    <View style={styles.largeCard}>
+      <ImageBackground source={item.imagem} style={styles.largeCardImage} imageStyle={{ borderRadius: theme.radius.md }}>
+        <View style={styles.largeOverlay}>
+          <Text style={styles.largeTitle} numberOfLines={1}>{item.nome}</Text>
+          <Text style={styles.largeDesc} numberOfLines={2}>{item.descricao}</Text>
+          <View style={styles.largeFooter}>
+            <Text style={styles.largePrice}>R$ {Number(item.preco).toFixed(2)}</Text>
+            <TouchableOpacity onPress={() => handleAddToCart(item)} style={styles.largeAddBtn}>
+              <MaterialCommunityIcons name="cart-plus" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ImageBackground>
+    </View>
+  );
+
+  /* ---------------------------- CARROSSEL BANNERS ---------------------------- */
+  const banners = [
+    { id: 'b1', img: require('../../assets/cards/paes.png'), title: 'Unitários', section: 'unitarios' },
+    { id: 'b2', img: require('../../assets/cards/banner.png'), title: 'Combos', section: 'combos' },
+    { id: 'b3', img: require('../../assets/cards/combo.png'), title: 'Cestas', section: 'cestas' },
+  ];
+
+  function onBannerPress(section, index) {
+    setActiveSection(section);
+    // snap carousel to index
+    if (carouselRef.current) {
+      carouselRef.current.scrollToIndex({ index, animated: true });
+    }
+  }
+
+  function onCarouselMomentum(e) {
+    const offsetX = e.nativeEvent.contentOffset.x;
+    const idx = Math.round(offsetX / width);
+    const safeIdx = Math.max(0, Math.min(banners.length - 1, idx));
+    const section = banners[safeIdx].section;
+    setActiveSection(section);
+  }
 
   /* ---------------------------- MAIN ---------------------------- */
   return (
@@ -418,12 +506,14 @@ export default function HomeApp() {
       {/* CARROSSEL */}
       <View style={styles.carouselWrapper}>
         <Animated.FlatList
-          data={promos}
-          keyExtractor={(p) => p.id}
+          ref={carouselRef}
+          data={banners}
+          keyExtractor={(b) => b.id}
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: true })}
+          onMomentumScrollEnd={onCarouselMomentum}
           snapToAlignment="center"
           decelerationRate="fast"
           renderItem={({ item, index }) => {
@@ -431,14 +521,18 @@ export default function HomeApp() {
 
             const scale = scrollX.interpolate({
               inputRange,
-              outputRange: [0.9, 1, 0.9],
+              outputRange: [0.92, 1, 0.92],
               extrapolate: 'clamp',
             });
 
             return (
-              <TouchableOpacity onPress={() => navigation.navigate("Promocoes")} activeOpacity={0.9}>
+              <TouchableOpacity activeOpacity={0.9} onPress={() => onBannerPress(item.section, index)}>
                 <Animated.View style={[styles.promoCard, { transform: [{ scale }] }]}>
-                  <Image source={item.img} style={styles.promoImage} />
+                  <ImageBackground source={item.img} style={styles.promoImage} imageStyle={{ resizeMode: 'cover' }}>
+                    <View style={styles.bannerOverlay}>
+                      <Text style={styles.bannerTitle}>{item.title}</Text>
+                    </View>
+                  </ImageBackground>
                 </Animated.View>
               </TouchableOpacity>
             );
@@ -447,7 +541,7 @@ export default function HomeApp() {
 
         {/* DOTS */}
         <View style={styles.dots}>
-          {promos.map((_, i) => {
+          {banners.map((_, i) => {
             const inputRange = [(i - 1) * width, i * width, (i + 1) * width];
 
             const dotScale = scrollX.interpolate({
@@ -469,18 +563,70 @@ export default function HomeApp() {
         </View>
       </View>
 
-      {/* GRID */}
-      <View style={styles.gridWrap}>
-        <FlatList
-          data={produtos}
-          keyExtractor={(p) => String(p.id)}
-          numColumns={2}
-          columnWrapperStyle={styles.columnWrapper}
-          renderItem={renderProduto}
-          showsVerticalScrollIndicator={false}
-        />
+      {/* TAB BAR */}
+      <View style={styles.tabBar}>
+        <TouchableOpacity style={[styles.tabItem, activeSection === 'unitarios' && styles.tabActive]} onPress={() => setActiveSection('unitarios')}>
+          <Text style={[styles.tabText, activeSection === 'unitarios' && styles.tabTextActive]}>Unitários</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.tabItem, activeSection === 'combos' && styles.tabActive]} onPress={() => setActiveSection('combos')}>
+          <Text style={[styles.tabText, activeSection === 'combos' && styles.tabTextActive]}>Combos</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.tabItem, activeSection === 'cestas' && styles.tabActive]} onPress={() => setActiveSection('cestas')}>
+          <Text style={[styles.tabText, activeSection === 'cestas' && styles.tabTextActive]}>Cestas</Text>
+        </TouchableOpacity>
       </View>
 
+      {/* SEARCH */}
+      <View style={styles.searchWrap}>
+        <Feather name="search" size={18} color={theme.colors.textSecondary} />
+        <TextInput
+          placeholder="Pesquisar itens..."
+          placeholderTextColor={theme.colors.textSecondary}
+          style={styles.searchInput}
+          value={search}
+          onChangeText={setSearch}
+          returnKeyType="search"
+        />
+        {search.length > 0 && (
+          <TouchableOpacity onPress={() => setSearch('')}>
+            <Feather name="x" size={18} color={theme.colors.textSecondary} />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* SECTION CONTENT */}
+      <View style={styles.gridWrap}>
+        {activeSection === 'unitarios' && (
+          <FlatList
+            data={filteredUnitarios}
+            keyExtractor={(p) => String(p.id)}
+            numColumns={2}
+            columnWrapperStyle={styles.columnWrapper}
+            renderItem={renderProduto}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
+
+        {activeSection === 'combos' && (
+          <FlatList
+            data={filteredCombos}
+            keyExtractor={(c) => c.id}
+            renderItem={renderLargeCard}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 50 }}
+          />
+        )}
+
+        {activeSection === 'cestas' && (
+          <FlatList
+            data={filteredCestas}
+            keyExtractor={(c) => c.id}
+            renderItem={renderLargeCard}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 50 }}
+          />
+        )}
+      </View>
     </View>
   );
 }
@@ -534,12 +680,26 @@ const styles = StyleSheet.create({
     elevation: 4,
     backgroundColor: '#fff',
   },
-  promoImage: { width: '100%', height: '100%', resizeMode: 'cover' },
+  promoImage: { width: '100%', height: '100%', justifyContent: 'center' },
+  bannerOverlay: {
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    alignSelf: 'stretch',
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bannerTitle: {
+    fontSize: 26,
+    fontWeight: '800',
+    color: '#fff',
+    textAlign: 'center',
+    letterSpacing: 0.6,
+  },
 
   dots: {
     flexDirection: 'row',
     alignSelf: 'center',
-    marginTop: 4,
+    marginTop: 6,
     marginBottom: 6,
   },
   dot: {
@@ -548,6 +708,52 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: theme.colors.primary,
     marginHorizontal: 4,
+  },
+
+  /* TAB BAR */
+  tabBar: {
+    flexDirection: 'row',
+    marginHorizontal: 18,
+    marginTop: 6,
+    borderRadius: 12,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  tabItem: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  tabActive: {
+    backgroundColor: theme.colors.primary,
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+  },
+  tabTextActive: {
+    color: '#fff',
+  },
+
+  /* SEARCH */
+  searchWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    marginHorizontal: 18,
+    marginTop: 10,
+    backgroundColor: theme.colors.surface || '#F5F5F5',
+    borderRadius: 12,
+    height: 44,
+  },
+  searchInput: {
+    flex: 1,
+    marginLeft: 10,
+    color: theme.colors.textPrimary,
+    fontSize: 15,
   },
 
   /* GRID */
@@ -561,7 +767,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
-  /* CARD */
+  /* CARD (unitarios) */
   card: {
     width: CARD_WIDTH,
     backgroundColor: '#FFF',
@@ -569,7 +775,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     overflow: 'hidden',
     position: 'relative',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   favBtn: {
     position: 'absolute',
@@ -610,5 +816,49 @@ const styles = StyleSheet.create({
     borderTopColor: '#EEE3D6',
     alignItems: 'center',
   },
-});
 
+  /* LARGE CARDS (combos / cestas) */
+  largeCard: {
+    marginBottom: 14,
+    borderRadius: theme.radius.md,
+    overflow: 'hidden',
+    elevation: 3,
+  },
+  largeCardImage: {
+    width: '100%',
+    height: LARGE_CARD_HEIGHT,
+    justifyContent: 'flex-end',
+  },
+  largeOverlay: {
+    padding: 12,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    borderBottomLeftRadius: theme.radius.md,
+    borderBottomRightRadius: theme.radius.md,
+  },
+  largeTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  largeDesc: {
+    fontSize: 13,
+    color: '#fff',
+    marginBottom: 8,
+  },
+  largeFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  largePrice: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#fff',
+  },
+  largeAddBtn: {
+    backgroundColor: theme.colors.primary,
+    padding: 8,
+    borderRadius: 8,
+  },
+});

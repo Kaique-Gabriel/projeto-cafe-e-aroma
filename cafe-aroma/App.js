@@ -4,7 +4,7 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
-// Telas
+// Telas principais
 import Welcome from './src/screens/Welcome';
 import Login from './src/screens/Login';
 import Cadastro from './src/screens/Cadastro';
@@ -20,25 +20,29 @@ import SobreApp from './src/screens/SobreApp';
 import Favoritos from './src/screens/Favoritos';
 import AjudaSuporte from './src/screens/AjudaSuporte';
 
-// 🔥 Tela adicionada para o 2FA
+// 2FA
 import Codigo2FA from './src/screens/Codigo2FA';
 
-// Drawer customizado
+// Drawer
 import DrawerCustom from './src/components/Drawer';
 
-// Providers
+// Contextos
 import { AppProvider, useApp } from './src/context/AppContext';
 import { CarrinhoProvider } from './src/context/CarrinhoContext';
 import { UserProvider } from './src/context/UserContext';
 import { FavoritosProvider } from './src/context/FavoritosContext';
 import { PedidosProvider } from './src/context/PedidosContext';
 
+// FLUXO DE PEDIDO
+import EnderecoEntrega from './src/screens/EnderecoEntrega';
+import Pagamento from './src/screens/Pagamento';        // ← ADICIONADO
+import ConfirmacaoPedido from './src/screens/ConfirmacaoPedido';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
 /* ============================================================
-   🔥 TEMA PERSONALIZADO — mistura do DefaultTheme + estilo Café
+   Tema Claro
 =============================================================== */
 const LightCoffeeTheme = {
   ...DefaultTheme,
@@ -52,6 +56,9 @@ const LightCoffeeTheme = {
   },
 };
 
+/* ============================================================
+   Tema Escuro
+=============================================================== */
 const DarkCoffeeTheme = {
   ...DarkTheme,
   colors: {
@@ -65,7 +72,7 @@ const DarkCoffeeTheme = {
 };
 
 /* ============================================================
-   DRAWER PRINCIPAL
+   Drawer Principal
 =============================================================== */
 function MainDrawer() {
   return (
@@ -83,7 +90,7 @@ function MainDrawer() {
 }
 
 /* ============================================================
-   NAVIGATION + THEME
+   Navegação Principal
 =============================================================== */
 function AppNavigation() {
   const { isDarkMode } = useApp();
@@ -92,58 +99,44 @@ function AppNavigation() {
     <NavigationContainer theme={isDarkMode ? DarkCoffeeTheme : LightCoffeeTheme}>
       <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
 
-        {/* Sem Header */}
+        {/* Sem header */}
         <Stack.Screen name="Welcome" component={Welcome} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Cadastro" component={Cadastro} />
 
-        {/* 🔥 Tela do 2FA */}
+        {/* 2FA */}
         <Stack.Screen name="Codigo2FA" component={Codigo2FA} />
 
         {/* Drawer */}
         <Stack.Screen name="MainApp" component={MainDrawer} />
 
-        {/* Com Header */}
+        {/* FLUXO DO PEDIDO */}
         <Stack.Screen
-          name="DetalhesPedido"
-          component={DetalhesPedido}
-          options={{ title: 'Detalhes do Pedido', headerShown: true }}
-        />
-        <Stack.Screen
-  name="PedidosInfo"
-  component={PedidosInfo}
-  options={{ title: 'Informações do Pedido', headerShown: true }}
-/>
-
-        <Stack.Screen
-          name="EditarPerfil"
-          component={EditarPerfil}
-          options={{ title: 'Editar Perfil', headerShown: true }}
+          name="EnderecoEntrega"
+          component={EnderecoEntrega}
+          options={{ headerShown: true, title: "Endereço de Entrega" }}
         />
 
         <Stack.Screen
-          name="Seguranca"
-          component={Seguranca}
-          options={{ title: 'Segurança', headerShown: true }}
+          name="Pagamento"             // ← AQUI!!!!
+          component={Pagamento}
+          options={{ headerShown: true, title: "Pagamento" }}
         />
 
         <Stack.Screen
-          name="SobreApp"
-          component={SobreApp}
-          options={{ title: 'Sobre o App', headerShown: true }}
+          name="ConfirmacaoPedido"
+          component={ConfirmacaoPedido}
+          options={{ headerShown: true, title: "Confirmar Pedido" }}
         />
 
-        <Stack.Screen
-          name="Favoritos"
-          component={Favoritos}
-          options={{ title: 'Favoritos', headerShown: true }}
-        />
-
-        <Stack.Screen
-          name="AjudaSuporte"
-          component={AjudaSuporte}
-          options={{ title: 'Ajuda & Suporte', headerShown: true }}
-        />
+        {/* Telas complementares */}
+        <Stack.Screen name="DetalhesPedido" component={DetalhesPedido} options={{ title: 'Detalhes do Pedido', headerShown: true }} />
+        <Stack.Screen name="PedidosInfo" component={PedidosInfo} options={{ title: 'Informações do Pedido', headerShown: true }} />
+        <Stack.Screen name="EditarPerfil" component={EditarPerfil} options={{ title: 'Editar Perfil', headerShown: true }} />
+        <Stack.Screen name="Seguranca" component={Seguranca} options={{ title: 'Segurança', headerShown: true }} />
+        <Stack.Screen name="SobreApp" component={SobreApp} options={{ title: 'Sobre o App', headerShown: true }} />
+        <Stack.Screen name="Favoritos" component={Favoritos} options={{ title: 'Favoritos', headerShown: true }} />
+        <Stack.Screen name="AjudaSuporte" component={AjudaSuporte} options={{ title: 'Ajuda & Suporte', headerShown: true }} />
 
       </Stack.Navigator>
     </NavigationContainer>
@@ -151,7 +144,7 @@ function AppNavigation() {
 }
 
 /* ============================================================
-   PROVIDERS ENVOLVENDO TUDO
+   Providers
 =============================================================== */
 export default function App() {
   return (
@@ -160,7 +153,7 @@ export default function App() {
         <CarrinhoProvider>
           <FavoritosProvider>
             <PedidosProvider>
-            <AppNavigation />
+              <AppNavigation />
             </PedidosProvider>
           </FavoritosProvider>
         </CarrinhoProvider>

@@ -8,12 +8,26 @@ export function PedidosProvider({ children }) {
   const [pedidos, setPedidos] = useState([]);        // pedidos em andamento
   const [historico, setHistorico] = useState([]);    // pedidos entregues
 
-  // Recebe o carrinho finalizado
+  /**
+   * novoPedido deve vir do Carrinho.js com a estrutura:
+   * {
+   *   id: number,
+   *   total: number,
+   *   itens: [...],
+   *   endereco: {
+   *     rua,
+   *     bairro,
+   *     numero,
+   *     complemento,
+   *     referencia
+   *   }
+   * }
+   */
   function adicionarPedido(novoPedido) {
     setPedidos(prev => [...prev, novoPedido]);
   }
 
-  // Marca como entregue e move para o histórico
+  // Marca como entregue e move para o histórico (mantendo endereço)
   function marcarComoEntregue(id) {
     const pedido = pedidos.find(p => p.id === id);
     if (!pedido) return;
@@ -24,7 +38,12 @@ export function PedidosProvider({ children }) {
 
   return (
     <PedidosContext.Provider
-      value={{ pedidos, historico, adicionarPedido, marcarComoEntregue }}
+      value={{
+        pedidos,
+        historico,
+        adicionarPedido,
+        marcarComoEntregue
+      }}
     >
       {children}
     </PedidosContext.Provider>

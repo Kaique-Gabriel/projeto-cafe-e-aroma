@@ -19,15 +19,55 @@ function PedidosAtuais() {
           keyExtractor={(item) => String(item.id)}
           renderItem={({ item }) => (
             <View style={styles.card}>
+              
+              {/* Cabeçalho */}
               <Text style={styles.title}>Pedido #{item.id}</Text>
+              {item.data && (
+                <Text style={styles.subtitle}>Realizado em: {item.data}</Text>
+              )}
               <Text style={styles.subtitle}>Total: R$ {item.total.toFixed(2)}</Text>
 
+              {/* Endereço */}
+              {item.endereco && (
+                <View style={styles.enderecoBox}>
+                  <Text style={styles.enderecoTitulo}>Endereço de Entrega:</Text>
+                  
+                  <Text style={styles.enderecoTxt}>Rua: {item.endereco.rua}</Text>
+                  <Text style={styles.enderecoTxt}>Número: {item.endereco.numero}</Text>
+                  <Text style={styles.enderecoTxt}>Bairro: {item.endereco.bairro}</Text>
+
+                  {item.endereco.cidade && (
+                    <Text style={styles.enderecoTxt}>Cidade: {item.endereco.cidade}</Text>
+                  )}
+
+                  {item.endereco.cep && (
+                    <Text style={styles.enderecoTxt}>CEP: {item.endereco.cep}</Text>
+                  )}
+
+                  {item.endereco.referencia && item.endereco.referencia !== "Nenhuma" && (
+                    <Text style={styles.enderecoTxt}>Ref.: {item.endereco.referencia}</Text>
+                  )}
+                </View>
+              )}
+
+              {/* Itens */}
+              <View style={styles.itensBox}>
+                <Text style={styles.itensTitulo}>Itens do pedido:</Text>
+                {item.itens?.map((produto, index) => (
+                  <Text key={index} style={styles.itensTxt}>
+                    • {produto.quantidade}x {produto.nome} – R$ {Number(produto.preco).toFixed(2)}
+                  </Text>
+                ))}
+              </View>
+
+              {/* Botão */}
               <TouchableOpacity
                 style={styles.entregarBtn}
                 onPress={() => marcarComoEntregue(item.id)}
               >
                 <Text style={styles.entregarTxt}>Marcar como entregue</Text>
               </TouchableOpacity>
+
             </View>
           )}
         />
@@ -49,9 +89,48 @@ function HistoricoPedidos() {
           keyExtractor={(item) => String(item.id)}
           renderItem={({ item }) => (
             <View style={styles.card}>
+
+              {/* Cabeçalho */}
               <Text style={styles.title}>Pedido #{item.id}</Text>
+              {item.data && (
+                <Text style={styles.subtitle}>Realizado em: {item.data}</Text>
+              )}
               <Text style={styles.subtitle}>Total: R$ {item.total.toFixed(2)}</Text>
-              <Text style={styles.subtitle}>Finalizado!</Text>
+              <Text style={styles.subtitle}>Status: Entregue ✔</Text>
+
+              {/* Endereço */}
+              {item.endereco && (
+                <View style={styles.enderecoBox}>
+                  <Text style={styles.enderecoTitulo}>Endereço de Entrega:</Text>
+
+                  <Text style={styles.enderecoTxt}>Rua: {item.endereco.rua}</Text>
+                  <Text style={styles.enderecoTxt}>Número: {item.endereco.numero}</Text>
+                  <Text style={styles.enderecoTxt}>Bairro: {item.endereco.bairro}</Text>
+
+                  {item.endereco.cidade && (
+                    <Text style={styles.enderecoTxt}>Cidade: {item.endereco.cidade}</Text>
+                  )}
+
+                  {item.endereco.cep && (
+                    <Text style={styles.enderecoTxt}>CEP: {item.endereco.cep}</Text>
+                  )}
+
+                  {item.endereco.referencia && item.endereco.referencia !== "Nenhuma" && (
+                    <Text style={styles.enderecoTxt}>Ref.: {item.endereco.referencia}</Text>
+                  )}
+                </View>
+              )}
+
+              {/* Itens */}
+              <View style={styles.itensBox}>
+                <Text style={styles.itensTitulo}>Itens do pedido:</Text>
+                {item.itens?.map((produto, index) => (
+                  <Text key={index} style={styles.itensTxt}>
+                    • {produto.quantidade}x {produto.nome} – R$ {Number(produto.preco).toFixed(2)}
+                  </Text>
+                ))}
+              </View>
+
             </View>
           )}
         />
@@ -99,8 +178,40 @@ const styles = StyleSheet.create({
     color: '#5A4637',
     marginTop: 5,
   },
-  entregarBtn: {
+  enderecoBox: {
+    backgroundColor: '#FFF4E1',
+    padding: 12,
+    borderRadius: 10,
     marginTop: 10,
+  },
+  enderecoTitulo: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#4E342E',
+    marginBottom: 5,
+  },
+  enderecoTxt: {
+    fontSize: 14,
+    color: '#5A4637',
+  },
+  itensBox: {
+    marginTop: 12,
+    backgroundColor: '#FDF6ED',
+    padding: 12,
+    borderRadius: 10,
+  },
+  itensTitulo: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#4E342E',
+    marginBottom: 5,
+  },
+  itensTxt: {
+    fontSize: 14,
+    color: '#5A4637',
+  },
+  entregarBtn: {
+    marginTop: 12,
     backgroundColor: '#4E342E',
     padding: 10,
     borderRadius: 10,
