@@ -441,15 +441,75 @@ export default function HomeApp() {
   };
 
   /* ---------------------------- RENDER LARGE CARD (Combos/Cestas) ---------------------------- */
-  const renderLargeCard = ({ item }) => (
+  const renderLargeCard = ({ item }) => {
+  const favorito = isFavorito(item.id);
+
+  return (
     <View style={styles.largeCard}>
-      <ImageBackground source={item.imagem} style={styles.largeCardImage} imageStyle={{ borderRadius: theme.radius.md }}>
-        <View style={styles.largeOverlay}>
-          <Text style={styles.largeTitle} numberOfLines={1}>{item.nome}</Text>
-          <Text style={styles.largeDesc} numberOfLines={2}>{item.descricao}</Text>
-          <View style={styles.largeFooter}>
-            <Text style={styles.largePrice}>R$ {Number(item.preco).toFixed(2)}</Text>
-            <TouchableOpacity onPress={() => handleAddToCart(item)} style={styles.largeAddBtn}>
+      <ImageBackground
+        source={item.imagem}
+        style={styles.largeCardImage}
+        imageStyle={{ borderRadius: theme.radius.md }}
+      >
+        {/* Botão de favoritar */}
+        <TouchableOpacity
+          style={styles.favBtnLarge}
+          onPress={() => toggleFavorito(item)}
+        >
+          <Ionicons
+            name={favorito ? 'heart' : 'heart-outline'}
+            size={26}
+            color={favorito ? '#ff4271' : '#fff'}
+          />
+        </TouchableOpacity>
+
+        {/* Área principal clicável */}
+        <TouchableOpacity
+          activeOpacity={0.95}
+          style={styles.largeTouchableArea}
+          onPress={() => {
+            if (activeSection === 'combos') {
+              navigation.navigate('ComboDetalhes', { combo: item });
+            } else if (activeSection === 'cestas') {
+              navigation.navigate('CestaDetalhes', { cesta: item });
+            }
+          }}
+        >
+          <View style={styles.largeOverlay}>
+            <Text style={styles.largeTitle} numberOfLines={1}>
+              {item.nome}
+            </Text>
+
+            <Text style={styles.largeDesc} numberOfLines={2}>
+              {item.descricao}
+            </Text>
+          </View>
+        </TouchableOpacity>
+
+        {/* FOOTER — fora do Touchable principal! */}
+        <View style={styles.largeFooter}>
+          <TouchableOpacity
+            onPress={() => {
+              if (activeSection === 'combos') {
+                navigation.navigate('ComboInfo', { combo: item });
+              } else {
+                navigation.navigate('CestaInfo', { cesta: item });
+              }
+            }}
+            style={styles.iconBtn}
+          >
+            <Feather name="info" size={20} color="#fff" />
+          </TouchableOpacity>
+
+          <View style={styles.largeRight}>
+            <Text style={styles.largePrice}>
+              R$ {Number(item.preco).toFixed(2)}
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => handleAddToCart(item)}
+              style={styles.largeAddBtn}
+            >
               <MaterialCommunityIcons name="cart-plus" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
@@ -457,6 +517,8 @@ export default function HomeApp() {
       </ImageBackground>
     </View>
   );
+};
+
 
   /* ---------------------------- CARROSSEL BANNERS ---------------------------- */
   const banners = [
@@ -834,6 +896,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.35)',
     borderBottomLeftRadius: theme.radius.md,
     borderBottomRightRadius: theme.radius.md,
+    flex: 1,
+    justifyContent: 'flex-end',
   },
   largeTitle: {
     fontSize: 18,
@@ -851,14 +915,40 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  largeLeftIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconBtn: {
+    padding: 6,
+    marginRight: 8,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 8,
+  },
+  largeRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   largePrice: {
     fontSize: 16,
     fontWeight: '800',
     color: '#fff',
+    marginRight: 10,
   },
   largeAddBtn: {
     backgroundColor: theme.colors.primary,
     padding: 8,
     borderRadius: 8,
+  },
+
+  /* Favorito grande (combos/cestas) */
+  favBtnLarge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 20,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    padding: 8,
+    borderRadius: 30,
   },
 });

@@ -10,7 +10,11 @@ import {
 } from "react-native";
 
 export default function EnderecoEntrega({ navigation, route }) {
-  const { carrinho, total } = route.params;
+
+  // --- CORREÇÃO IMPORTANTE ---
+  // Garante que mesmo se vier undefined, não quebre
+  const carrinho = route?.params?.carrinho ?? [];
+  const total = route?.params?.total ?? 0;
 
   const [rua, setRua] = useState("");
   const [numero, setNumero] = useState("");
@@ -58,11 +62,13 @@ export default function EnderecoEntrega({ navigation, route }) {
 
     setTimeout(() => {
       setLoading(false);
+
       navigation.navigate("ConfirmacaoPedido", {
         endereco,
         carrinho,
         total,
       });
+
     }, 200);
   }
 

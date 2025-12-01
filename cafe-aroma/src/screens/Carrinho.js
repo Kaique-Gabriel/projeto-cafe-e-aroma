@@ -3,9 +3,6 @@ import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
 import { CarrinhoContext } from '../context/CarrinhoContext';
 
-// 🔥 IMPORT NECESSÁRIO
-import { PedidosContext } from '../context/PedidosContext';
-
 export default function Carrinho({ navigation }) {
 
   const {
@@ -17,14 +14,11 @@ export default function Carrinho({ navigation }) {
     total
   } = useContext(CarrinhoContext);
 
-  // ⛔ NÃO vamos finalizar direto
-  // const { adicionarPedido } = useContext(PedidosContext);
-
-  function irParaEndereco() {
+  // 🚀 Agora NÃO vamos mais para o endereço diretamente
+  function irParaMetodoPagamento() {
     if (carrinho.length === 0) return;
 
-    // Vamos enviar os dados do carrinho para a tela de Endereço
-    navigation.navigate("EnderecoEntrega", {
+    navigation.navigate("MetodoPagamento", {
       carrinho,
       total
     });
@@ -87,8 +81,12 @@ export default function Carrinho({ navigation }) {
           <View style={styles.footer}>
             <Text style={styles.totalTexto}>Total: R$ {total.toFixed(2)}</Text>
 
-            <TouchableOpacity style={styles.finalizarBotao} onPress={irParaEndereco}>
-              <Text style={styles.finalizarTexto}>Prosseguir para Endereço</Text>
+            {/* 🔥 Botão agora leva para Método de Pagamento */}
+            <TouchableOpacity
+              style={styles.finalizarBotao}
+              onPress={irParaMetodoPagamento}
+            >
+              <Text style={styles.finalizarTexto}>Escolher Método de Pagamento</Text>
             </TouchableOpacity>
           </View>
         </>

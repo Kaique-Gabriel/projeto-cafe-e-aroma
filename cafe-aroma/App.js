@@ -33,10 +33,19 @@ import { UserProvider } from './src/context/UserContext';
 import { FavoritosProvider } from './src/context/FavoritosContext';
 import { PedidosProvider } from './src/context/PedidosContext';
 
-// FLUXO DE PEDIDO
+// FLUXO DO PEDIDO
 import EnderecoEntrega from './src/screens/EnderecoEntrega';
-import Pagamento from './src/screens/Pagamento';        // ← ADICIONADO
+import MetodoPagamento from './src/screens/MetodoPagamento';
 import ConfirmacaoPedido from './src/screens/ConfirmacaoPedido';
+
+// NOVAS TELAS (adicionadas agora)
+import PagamentoPix from './src/screens/PagamentoPix';
+import PagamentoCartao from './src/screens/PagamentoCartao';
+import PagamentoDinheiro from './src/screens/PagamentoDinheiro';
+import ComboDetalhes from './src/screens/ComboDetalhes';
+import ComboInfo from './src/screens/ComboInfo';
+import CestaDetalhes from './src/screens/CestaDetalhes';
+import CestaInfo from './src/screens/CestaInfo';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -112,15 +121,15 @@ function AppNavigation() {
 
         {/* FLUXO DO PEDIDO */}
         <Stack.Screen
-          name="EnderecoEntrega"
-          component={EnderecoEntrega}
-          options={{ headerShown: true, title: "Endereço de Entrega" }}
+          name="MetodoPagamento"
+          component={MetodoPagamento}
+          options={{ headerShown: true, title: "Método de Pagamento" }}
         />
 
         <Stack.Screen
-          name="Pagamento"             // ← AQUI!!!!
-          component={Pagamento}
-          options={{ headerShown: true, title: "Pagamento" }}
+          name="EnderecoEntrega"
+          component={EnderecoEntrega}
+          options={{ headerShown: true, title: "Endereço de Entrega" }}
         />
 
         <Stack.Screen
@@ -128,6 +137,48 @@ function AppNavigation() {
           component={ConfirmacaoPedido}
           options={{ headerShown: true, title: "Confirmar Pedido" }}
         />
+
+        {/* TELAS DE PAGAMENTO — novas */}
+        <Stack.Screen
+          name="PagamentoPix"
+          component={PagamentoPix}
+          options={{ headerShown: true, title: "Pagamento via Pix" }}
+        />
+
+        <Stack.Screen
+          name="PagamentoCartao"
+          component={PagamentoCartao}
+          options={{ headerShown: true, title: "Pagamento com Cartão" }}
+        />
+
+        <Stack.Screen
+          name="PagamentoDinheiro"
+          component={PagamentoDinheiro}
+          options={{ headerShown: true, title: "Pagamento em Dinheiro" }}
+        />
+        {/* DETALHES DE COMBO E CESTA */}
+<Stack.Screen
+  name="ComboDetalhes"
+  component={ComboDetalhes}
+  options={{ headerShown: true, title: "Detalhes do Combo" }}
+/>
+<Stack.Screen
+  name="ComboInfo"
+  component={ComboInfo}
+  options={{ headerShown: true, title: "Informações do Combo" }}
+/>
+
+<Stack.Screen
+  name="CestaDetalhes"
+  component={CestaDetalhes}
+  options={{ headerShown: true, title: "Detalhes da Cesta" }}
+/>
+<Stack.Screen
+  name="CestaInfo"
+  component={CestaInfo}
+  options={{ headerShown: true, title: "Informações da Cesta" }}
+/>
+
 
         {/* Telas complementares */}
         <Stack.Screen name="DetalhesPedido" component={DetalhesPedido} options={{ title: 'Detalhes do Pedido', headerShown: true }} />
