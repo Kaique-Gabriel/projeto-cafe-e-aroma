@@ -13,8 +13,13 @@ import { CarrinhoContext } from "../context/CarrinhoContext";
 
 export default function ConfirmacaoPedido({ navigation, route }) {
 
-  // Agora recebemos também "pagamento"
-  const { endereco, carrinho, total, pagamento } = route.params;
+  // ✅ RECEBENDO TODOS OS DADOS
+  const endereco = route?.params?.endereco ?? {};
+  const itens = route?.params?.itens ?? [];
+  const valorTotal = route?.params?.valorTotal ?? 0;
+
+  // 🔥 CORREÇÃO AQUI — agora pega o que realmente foi enviado
+  const metodoPagamento = route?.params?.pagamento ?? "Não informado";
 
   const { adicionarPedido } = useContext(PedidosContext);
   const { limparCarrinho } = useContext(CarrinhoContext);
@@ -22,11 +27,11 @@ export default function ConfirmacaoPedido({ navigation, route }) {
   function finalizarTudo() {
     const pedido = {
       id: Date.now(),
-      itens: carrinho,
-      total,
+      itens,
+      total: valorTotal,
       data: new Date().toLocaleString(),
       endereco,
-      pagamento, // ← AGORA SALVA TAMBÉM O MÉTODO DE PAGAMENTO
+      pagamento: metodoPagamento,
     };
 
     adicionarPedido(pedido);
@@ -42,9 +47,7 @@ export default function ConfirmacaoPedido({ navigation, route }) {
       {/* ENDEREÇO */}
       <View style={styles.section}>
         <Text style={styles.sectionTitulo}>Endereço</Text>
-        <Text style={styles.texto}>
-          {endereco.rua}, {endereco.numero}
-        </Text>
+        <Text style={styles.texto}>{endereco.rua}, {endereco.numero}</Text>
         <Text style={styles.texto}>{endereco.bairro}</Text>
         <Text style={styles.texto}>{endereco.cidade}</Text>
         <Text style={styles.texto}>CEP: {endereco.cep}</Text>
@@ -56,15 +59,13 @@ export default function ConfirmacaoPedido({ navigation, route }) {
       {/* PAGAMENTO */}
       <View style={styles.section}>
         <Text style={styles.sectionTitulo}>Forma de Pagamento</Text>
-        <Text style={styles.texto}>
-          {pagamento ? pagamento : "Não informado"}
-        </Text>
+        <Text style={styles.texto}>{metodoPagamento}</Text>
       </View>
 
       {/* ITENS */}
       <View style={styles.section}>
         <Text style={styles.sectionTitulo}>Itens do Pedido</Text>
-        {carrinho.map((item, index) => (
+        {itens.map((item, index) => (
           <Text key={index} style={styles.texto}>
             • {item.nome} — R$ {item.preco.toFixed(2)}
           </Text>
@@ -74,7 +75,7 @@ export default function ConfirmacaoPedido({ navigation, route }) {
       {/* TOTAL */}
       <View style={styles.section}>
         <Text style={styles.totalTitulo}>Total</Text>
-        <Text style={styles.totalValor}>R$ {total.toFixed(2)}</Text>
+        <Text style={styles.totalValor}>R$ {valorTotal.toFixed(2)}</Text>
       </View>
 
       {/* FINALIZAR */}

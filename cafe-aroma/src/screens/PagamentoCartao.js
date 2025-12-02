@@ -3,15 +3,34 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function PagamentoCartao({ navigation }) {
+export default function PagamentoCartao({ navigation, route }) {
+
+  // 🔥 Agora pegamos TUDO que veio do carrinho → MetodoPagamento → aqui
+  const itens = route?.params?.itens ?? [];
+  const valorTotal = route?.params?.valorTotal ?? 0;
+  const quantidadeTotal = route?.params?.quantidadeTotal ?? 0;
+
   const [nome, setNome] = useState("");
   const [numero, setNumero] = useState("");
   const [validade, setValidade] = useState("");
   const [cvv, setCvv] = useState("");
 
-  const handleContinuar = () => {
-    navigation.navigate("EnderecoEntrega");
-  };
+  function handleContinuar() {
+
+    // 🔥 ENVIANDO TODOS OS DADOS NECESSÁRIOS → EnderecoEntrega
+    navigation.navigate("EnderecoEntrega", {
+      itens,
+      valorTotal,
+      quantidadeTotal,
+      metodoPagamento: "cartao",
+      dadosCartao: {
+        nome,
+        numero,
+        validade,
+        cvv,
+      },
+    });
+  }
 
   return (
     <View style={styles.container}>
@@ -46,6 +65,7 @@ export default function PagamentoCartao({ navigation }) {
             value={validade}
             onChangeText={setValidade}
           />
+
           <TextInput
             style={[styles.input, styles.half]}
             placeholder="CVV"

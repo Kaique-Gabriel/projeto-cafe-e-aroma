@@ -27,6 +27,30 @@ export default function EditarPerfil() {
 
   const fadeAnim = useState(new Animated.Value(0))[0];
 
+  // ESTADOS DO ALERTA PERSONALIZADO
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("error");
+  const alertAnim = useState(new Animated.Value(0))[0];
+
+  function showAlert(msg, type = "error") {
+    setAlertMessage(msg);
+    setAlertType(type);
+
+    Animated.timing(alertAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      setTimeout(() => {
+        Animated.timing(alertAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      }, 1800);
+    });
+  }
+
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -64,7 +88,7 @@ export default function EditarPerfil() {
   async function pickImage() {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) {
-      alert("Permissão necessária para acessar a galeria.");
+      showAlert("Permissão necessária para acessar a galeria.");
       return;
     }
 
@@ -77,13 +101,14 @@ export default function EditarPerfil() {
 
     if (!result.canceled && result.assets && result.assets[0]) {
       setPhoto(result.assets[0].uri);
+      showAlert("Foto selecionada!", "success");
     }
   }
 
   async function takePhoto() {
     const perm = await ImagePicker.requestCameraPermissionsAsync();
     if (!perm.granted) {
-      alert("Permissão necessária para usar a câmera.");
+      showAlert("Permissão necessária para usar a câmera.");
       return;
     }
 
@@ -95,12 +120,13 @@ export default function EditarPerfil() {
 
     if (!result.canceled && result.assets && result.assets[0]) {
       setPhoto(result.assets[0].uri);
+      showAlert("Foto atualizada!", "success");
     }
   }
 
   async function salvar() {
     if (!name.trim() || !email.trim()) {
-      alert("Preencha nome e email.");
+      showAlert("Preencha nome e email.");
       return;
     }
 
@@ -111,7 +137,9 @@ export default function EditarPerfil() {
       photo,
     });
 
-    navigation.goBack();
+    showAlert("Perfil atualizado!", "success");
+
+    setTimeout(() => navigation.goBack(), 900);
   }
 
   return (
@@ -126,6 +154,28 @@ export default function EditarPerfil() {
         showsVerticalScrollIndicator={false}
       >
         <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+
+          {/* ALERTA PERSONALIZADO */}
+          <Animated.View
+            style={[
+              styles.alertBox,
+              {
+                opacity: alertAnim,
+                transform: [
+                  {
+                    translateY: alertAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [-20, 0],
+                    }),
+                  },
+                ],
+                backgroundColor:
+                  alertType === "error" ? "#D9534F" : "#5CB85C",
+              },
+            ]}
+          >
+            <Text style={styles.alertText}>{alertMessage}</Text>
+          </Animated.View>
 
           <Text style={styles.title}>Editar Perfil</Text>
 
@@ -189,6 +239,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F4EEE9",
     padding: 26,
+  },
+
+  /* ALERTA PERSONALIZADO */
+  alertBox: {
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 15,
+    alignSelf: "center",
+  },
+  alertText: {
+    color: "#FFF",
+    fontWeight: "700",
+    fontSize: 15,
   },
 
   title: {

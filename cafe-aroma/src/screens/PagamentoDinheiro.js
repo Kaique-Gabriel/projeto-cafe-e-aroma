@@ -3,16 +3,34 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function PagamentoDinheiro({ navigation }) {
-  const handleContinuar = () => {
-    navigation.navigate("EnderecoEntrega");
-  };
+export default function PagamentoDinheiro({ navigation, route }) {
+  
+  // 🔥 Pegando TUDO que veio do carrinho → MetodoPagamento → aqui
+  const itens = route?.params?.itens ?? [];
+  const valorTotal = route?.params?.valorTotal ?? 0;
+  const quantidadeTotal = route?.params?.quantidadeTotal ?? 0;
+
+  function handleContinuar() {
+
+    // 🔥 ENVIANDO TODOS OS DADOS PARA O ENDEREÇO
+    navigation.navigate("EnderecoEntrega", {
+      itens,
+      valorTotal,
+      quantidadeTotal,
+      metodoPagamento: "dinheiro",
+    });
+  }
 
   return (
     <View style={styles.container}>
       <View style={styles.card}>
 
-        <Ionicons name="cash-outline" size={100} color="#C78C65" style={{ marginBottom: 20 }} />
+        <Ionicons
+          name="cash-outline"
+          size={100}
+          color="#C78C65"
+          style={{ marginBottom: 20 }}
+        />
 
         <Text style={styles.title}>Pagamento em Dinheiro</Text>
         <Text style={styles.subtitle}>

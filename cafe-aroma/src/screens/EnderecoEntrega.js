@@ -11,11 +11,13 @@ import {
 
 export default function EnderecoEntrega({ navigation, route }) {
 
-  // --- CORREÇÃO IMPORTANTE ---
-  // Garante que mesmo se vier undefined, não quebre
-  const carrinho = route?.params?.carrinho ?? [];
-  const total = route?.params?.total ?? 0;
+  // --- AGORA LER OS PARAMS CERTOS ---
+  const itens = route?.params?.itens ?? [];
+  const valorTotal = route?.params?.valorTotal ?? 0;
+  const quantidadeTotal = route?.params?.quantidadeTotal ?? 0;
+  const metodoPagamento = route?.params?.metodoPagamento ?? null;
 
+  // Campos do formulário
   const [rua, setRua] = useState("");
   const [numero, setNumero] = useState("");
   const [bairro, setBairro] = useState("");
@@ -28,7 +30,9 @@ export default function EnderecoEntrega({ navigation, route }) {
   function formatarCEP(text) {
     const somenteNumeros = text.replace(/\D/g, "");
     if (somenteNumeros.length <= 5) return somenteNumeros;
-    return somenteNumeros.slice(0, 5) + "-" + somenteNumeros.slice(5, 8);
+    return (
+      somenteNumeros.slice(0, 5) + "-" + somenteNumeros.slice(5, 8)
+    );
   }
 
   function validarCampos() {
@@ -63,11 +67,13 @@ export default function EnderecoEntrega({ navigation, route }) {
     setTimeout(() => {
       setLoading(false);
 
-      navigation.navigate("ConfirmacaoPedido", {
-        endereco,
-        carrinho,
-        total,
-      });
+navigation.navigate("ConfirmacaoPedido", {
+  endereco,
+  itens,
+  valorTotal,
+  quantidadeTotal,
+  pagamento: metodoPagamento,
+});
 
     }, 200);
   }
@@ -136,8 +142,12 @@ export default function EnderecoEntrega({ navigation, route }) {
       {/* Resumo */}
       <View style={styles.resumoBox}>
         <Text style={styles.resumoTitulo}>Resumo do Pedido</Text>
-        <Text style={styles.resumoTexto}>Itens: {carrinho.length}</Text>
-        <Text style={styles.resumoTexto}>Total: R$ {total.toFixed(2)}</Text>
+
+        <Text style={styles.resumoTexto}>Itens: {quantidadeTotal}</Text>
+
+        <Text style={styles.resumoTexto}>
+          Total: R$ {valorTotal.toFixed(2)}
+        </Text>
       </View>
 
       {/* Botão */}

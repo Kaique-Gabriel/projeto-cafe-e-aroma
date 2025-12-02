@@ -12,6 +12,8 @@ import {
   Modal
 } from 'react-native';
 
+import { Ionicons } from '@expo/vector-icons'; // ✨ ÍCONES
+import { useUser } from '../context/UserContext'; // Importar UserContext
 import { cadastrarUsuario, getUsuarioPorEmail } from '../utils/Auth';
 
 export default function Cadastro({ navigation }) {
@@ -19,8 +21,13 @@ export default function Cadastro({ navigation }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmSenha, setConfirmSenha] = useState('');
-
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [mostrarConfirmSenha, setMostrarConfirmSenha] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [customAlert, setCustomAlert] = useState({ visible: false, msg: '' });
+  
+  // Acessando UserContext
+  const { updateUser } = useUser();
 
   const fadeLogo = useRef(new Animated.Value(0)).current;
   const fadeContent = useRef(new Animated.Value(0)).current;
@@ -40,30 +47,37 @@ export default function Cadastro({ navigation }) {
     ]).start();
   }, []);
 
-  async function validarCadastro() {
-    if (!nome.trim()) return showError("Por favor, insira seu nome.");
-    if (!email.includes('@') || !email.includes('.'))
-      return showError("Digite um e-mail válido.");
-    if (senha.length < 6)
-      return showError("A senha deve ter ao menos 6 caracteres.");
-    if (senha !== confirmSenha)
-      return showError("As senhas não coincidem.");
-
-    const existente = await getUsuarioPorEmail(email);
-
-    if (existente) return showError("Já existe uma conta com esse e-mail.");
-
-    const ok = await cadastrarUsuario(nome, email, senha);
-
-    if (ok) {
-      setModalVisible(true);
-    } else {
-      showError("Erro inesperado ao cadastrar. Tente novamente.");
-    }
+  function showError(msg) {
+    setCustomAlert({ visible: true, msg });
   }
 
-  function showError(msg) {
-    return alert(msg);
+  async function validarCadastro() {
+    if (!nome.trim()) return showError("Por favor, insira seu nome.");
+    if (!email.includes('@') || !email.includes('.')) return showError("Digite um e-mail válido.");
+    if (senha.length < 6) return showError("A senha deve ter ao menos 6 caracteres.");
+    if (senha !== confirmSenha) return showError("As senhas não coincidem.");
+
+    // Verificando se o e-mail já existe
+    const existente = await getUsuarioPorEmail(email);
+    if (existente) return showError("Já existe uma conta com esse e-mail.");
+
+    // Cadastrar o usuário
+    const resposta = await cadastrarUsuario(nome, email, senha);
+
+    if (!resposta.ok) {
+      return showError(resposta.msg || "Erro inesperado ao cadastrar. Tente novamente.");
+    }
+
+    // Atualiza o UserContext após sucesso no cadastro
+    updateUser({
+      name: nome,
+      email: email,
+      photo: null, // Por enquanto sem foto
+      phone: "" // Pode ser adicionado posteriormente
+    });
+
+    // Exibe o modal de sucesso
+    setModalVisible(true);
   }
 
   return (
@@ -72,7 +86,6 @@ export default function Cadastro({ navigation }) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.container}>
-        
         <Animated.Image
           source={require('../../assets/images/icons/logo.png')}
           style={[styles.logo, { opacity: fadeLogo }]}
@@ -83,37 +96,67 @@ export default function Cadastro({ navigation }) {
           <Text style={styles.title}>Criar Conta</Text>
           <Text style={styles.subtitle}>Cadastre-se e aproveite ☕</Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Nome"
-            value={nome}
-            onChangeText={setNome}
-          />
+          {/* NOME */}
+          <View style={styles.inputBox}>
+            <Ionicons name="person-outline" size={22} color="#6A4A3C" style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Nome"
+              value={nome}
+              onChangeText={setNome}
+            />
+          </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
+          {/* EMAIL */}
+          <View style={styles.inputBox}>
+            <Ionicons name="mail-outline" size={22} color="#6A4A3C" style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+          </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Senha"
-            value={senha}
-            onChangeText={setSenha}
-            secureTextEntry
-          />
+          {/* SENHA */}
+          <View style={styles.inputBox}>
+            <Ionicons name="lock-closed-outline" size={22} color="#6A4A3C" style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Senha"
+              value={senha}
+              onChangeText={setSenha}
+              secureTextEntry={!mostrarSenha}
+            />
+            <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
+              <Ionicons
+                name={mostrarSenha ? "eye-off-outline" : "eye-outline"}
+                size={22}
+                color="#6A4A3C"
+              />
+            </TouchableOpacity>
+          </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Confirmar Senha"
-            value={confirmSenha}
-            onChangeText={setConfirmSenha}
-            secureTextEntry
-          />
+          {/* CONFIRMAR SENHA */}
+          <View style={styles.inputBox}>
+            <Ionicons name="key-outline" size={22} color="#6A4A3C" style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Confirmar Senha"
+              value={confirmSenha}
+              onChangeText={setConfirmSenha}
+              secureTextEntry={!mostrarConfirmSenha}
+            />
+            <TouchableOpacity onPress={() => setMostrarConfirmSenha(!mostrarConfirmSenha)}>
+              <Ionicons
+                name={mostrarConfirmSenha ? "eye-off-outline" : "eye-outline"}
+                size={22}
+                color="#6A4A3C"
+              />
+            </TouchableOpacity>
+          </View>
 
           <TouchableOpacity style={styles.btnPrimary} onPress={validarCadastro}>
             <Text style={styles.btnPrimaryText}>Criar Conta</Text>
@@ -132,10 +175,7 @@ export default function Cadastro({ navigation }) {
           <View style={styles.modalBackground}>
             <View style={styles.modalBox}>
               <Text style={styles.modalTitle}>Conta criada!</Text>
-              <Text style={styles.modalText}>
-                Sua conta foi criada com sucesso ☕✨
-              </Text>
-
+              <Text style={styles.modalText}>Sua conta foi criada com sucesso ☕✨</Text>
               <TouchableOpacity
                 style={styles.modalButton}
                 onPress={() => {
@@ -149,10 +189,27 @@ export default function Cadastro({ navigation }) {
           </View>
         </Modal>
 
+        {/* ✨ CUSTOM ALERT */}
+        <Modal visible={customAlert.visible} transparent animationType="fade">
+          <View style={styles.alertBackground}>
+            <View style={styles.alertBox}>
+              <Ionicons name="warning-outline" size={40} color="#8C4A2F" />
+              <Text style={styles.alertText}>{customAlert.msg}</Text>
+
+              <TouchableOpacity
+                style={styles.alertButton}
+                onPress={() => setCustomAlert({ visible: false, msg: '' })}
+              >
+                <Text style={styles.alertButtonText}>Entendi</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
+// ------------------ ESTILOS ------------------
 
 const styles = StyleSheet.create({
   container: {
@@ -180,16 +237,27 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-  input: {
+
+  inputBox: {
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "#FFF",
-    width: "100%",
-    padding: 14,
     borderRadius: 14,
-    marginBottom: 12,
     borderWidth: 1,
     borderColor: "#C7B39A",
-    fontSize: 15,
+    paddingHorizontal: 12,
+    marginBottom: 13,
   },
+  icon: {
+    marginRight: 8,
+  },
+  input: {
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: "#4C2E1E",
+  },
+
   btnPrimary: {
     backgroundColor: "#6A4A3C",
     paddingVertical: 16,
@@ -202,6 +270,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "700",
   },
+
   btnSecondary: {
     marginTop: 14,
     paddingVertical: 14,
@@ -213,7 +282,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
-  // MODAL
   modalBackground: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -250,6 +318,39 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: "#FFF",
     fontSize: 16,
+    fontWeight: "700",
+  },
+
+  alertBackground: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  alertBox: {
+    width: "80%",
+    backgroundColor: "#FFF4EB",
+    borderRadius: 18,
+    padding: 24,
+    alignItems: "center",
+    borderWidth: 1.5,
+    borderColor: "#D5B9A2",
+  },
+  alertText: {
+    fontSize: 16,
+    color: "#6A4A3C",
+    textAlign: "center",
+    marginVertical: 15,
+  },
+  alertButton: {
+    backgroundColor: "#6A4A3C",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  alertButtonText: {
+    color: "#FFF",
+    fontSize: 15,
     fontWeight: "700",
   },
 });

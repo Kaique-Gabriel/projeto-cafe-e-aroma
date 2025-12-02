@@ -14,13 +14,14 @@ export default function Carrinho({ navigation }) {
     total
   } = useContext(CarrinhoContext);
 
-  // 🚀 Agora NÃO vamos mais para o endereço diretamente
+  // 🚀 AGORA ENVIAMOS TUDO DE FORMA COMPLETA
   function irParaMetodoPagamento() {
     if (carrinho.length === 0) return;
 
     navigation.navigate("MetodoPagamento", {
-      carrinho,
-      total
+      itens: carrinho,
+      valorTotal: total,
+      quantidadeTotal: carrinho.length,
     });
   }
 

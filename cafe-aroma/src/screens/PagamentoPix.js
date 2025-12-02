@@ -3,18 +3,37 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function PagamentoPix({ navigation }) {
+export default function PagamentoPix({ navigation, route }) {
+
+  // 🔥 Recebendo os dados vindos do MetodoPagamento
+  const itens = route?.params?.itens ?? [];
+  const valorTotal = route?.params?.valorTotal ?? 0;
+  const quantidadeTotal = route?.params?.quantidadeTotal ?? 0;
+
   const handleContinuar = () => {
-    navigation.navigate("EnderecoEntrega");
+
+    // 🔥 ENVIANDO OS DADOS COMPLETOS PARA O ENDEREÇO
+    navigation.navigate("EnderecoEntrega", {
+      itens,
+      valorTotal,
+      quantidadeTotal,
+      metodoPagamento: "pix",
+    });
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.card}>
 
-        <Ionicons name="qr-code-outline" size={90} color="#C78C65" style={{ marginBottom: 15 }} />
+        <Ionicons
+          name="qr-code-outline"
+          size={90}
+          color="#C78C65"
+          style={{ marginBottom: 15 }}
+        />
 
         <Text style={styles.title}>Pagamento via Pix</Text>
+
         <Text style={styles.subtitle}>
           Escaneie o QR Code no caixa ou finalize direto com o atendente.
         </Text>

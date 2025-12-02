@@ -1,5 +1,4 @@
-// src/screens/Perfil.js
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,11 +8,27 @@ import {
   ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useUser } from "../context/UserContext"; // IMPORTANTE
+import { useUser } from "../context/UserContext";
+import { getUsuarioLogado } from "../utils/Auth"; // Use o getUsuarioLogado() para pegar o usuário atual
 
 export default function Perfil() {
   const navigation = useNavigation();
-  const { user } = useUser();
+  const { user, setUser } = useUser(); // Para sincronizar com o contexto
+  const [localUser, setLocalUser] = useState(null);
+
+  // Carrega usuário salvo no AsyncStorage ao iniciar a tela
+  useEffect(() => {
+    async function loadUser() {
+      const u = await getUsuarioLogado(); // Usando getUsuarioLogado
+      if (u) {
+        setLocalUser(u);
+        setUser(u); // Sincroniza com o contexto
+      }
+    }
+    loadUser();
+  }, []);
+
+  const displayUser = localUser || user;
 
   return (
     <ScrollView
@@ -28,19 +43,19 @@ export default function Perfil() {
       <View style={styles.profileWrapper}>
         <Image
           source={
-            user?.photo
-              ? { uri: user.photo }
+            displayUser?.photo
+              ? { uri: displayUser.photo }
               : require("../../assets/images/profile/avatar-placeholder.png")
           }
           style={styles.profileImage}
         />
 
         <Text style={styles.profileName}>
-          {user?.name || "Usuário"}
+          {displayUser?.nome || displayUser?.name || "Usuário"}
         </Text>
 
         <Text style={styles.profileEmail}>
-          {user?.email || "email@exemplo.com"}
+          {displayUser?.email || "email@exemplo.com"}
         </Text>
       </View>
 

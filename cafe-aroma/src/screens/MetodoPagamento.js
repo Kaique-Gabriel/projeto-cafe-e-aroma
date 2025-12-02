@@ -14,7 +14,13 @@ import {
   Feather,
 } from "@expo/vector-icons";
 
-export default function MetodoPagamento({ navigation }) {
+export default function MetodoPagamento({ navigation, route }) {
+
+  // 🔥 RECEBENDO OS DADOS DO CARRINHO
+  const itens = route?.params?.itens ?? [];
+  const valorTotal = Number(route?.params?.valorTotal ?? 0);
+  const quantidadeTotal = route?.params?.quantidadeTotal ?? 0;
+
   const [selecionado, setSelecionado] = useState(null);
   const animScale = useRef(new Animated.Value(1)).current;
 
@@ -43,9 +49,22 @@ export default function MetodoPagamento({ navigation }) {
   function continuar() {
     if (!selecionado) return;
 
-    if (selecionado === "pix") navigation.navigate("PagamentoPix");
-    if (selecionado === "cartao") navigation.navigate("PagamentoCartao");
-    if (selecionado === "dinheiro") navigation.navigate("PagamentoDinheiro");
+    // ✅ AGORA O MÉTODO DE PAGAMENTO ESTÁ SENDO ENVIADO!
+    const params = {
+      itens,
+      valorTotal,
+      quantidadeTotal,
+      pagamento: selecionado, // ← ESSENCIAL
+    };
+
+    if (selecionado === "pix")
+      navigation.navigate("PagamentoPix", params);
+
+    if (selecionado === "cartao")
+      navigation.navigate("PagamentoCartao", params);
+
+    if (selecionado === "dinheiro")
+      navigation.navigate("PagamentoDinheiro", params);
   }
 
   const opcoes = [
