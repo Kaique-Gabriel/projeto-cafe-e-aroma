@@ -13,6 +13,7 @@ import {
   ScrollView,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { useUser } from "../context/UserContext";
 
@@ -20,14 +21,13 @@ export default function EditarPerfil() {
   const navigation = useNavigation();
   const { user, updateUser } = useUser();
 
-  const [name, setName] = useState(user?.name || "");
+  const [name, setName] = useState(user?.name || user?.nome || "");
   const [email, setEmail] = useState(user?.email || "");
-  const [phone, setPhone] = useState(user?.phone || "");
   const [photo, setPhoto] = useState(user?.photo || null);
 
   const fadeAnim = useState(new Animated.Value(0))[0];
 
-  // ESTADOS DO ALERTA PERSONALIZADO
+  // ALERTA
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("error");
   const alertAnim = useState(new Animated.Value(0))[0];
@@ -47,7 +47,7 @@ export default function EditarPerfil() {
           duration: 300,
           useNativeDriver: true,
         }).start();
-      }, 1800);
+      }, 1600);
     });
   }
 
@@ -60,30 +60,10 @@ export default function EditarPerfil() {
   }, []);
 
   useEffect(() => {
-    setName(user?.name || "");
+    setName(user?.name || user?.nome || "");
     setEmail(user?.email || "");
-    setPhone(user?.phone || "");
     setPhoto(user?.photo || null);
   }, [user]);
-
-  function formatPhone(value) {
-    if (!value) {
-      setPhone("");
-      return;
-    }
-
-    let v = value.replace(/\D/g, "");
-    if (v.length > 11) v = v.slice(0, 11);
-
-    if (v.length <= 10) {
-      v = v.replace(/(\d{2})(\d)/, "($1) $2");
-      v = v.replace(/(\d{4})(\d)/, "$1-$2");
-    } else {
-      v = v.replace(/(\d{2})(\d)/, "($1) $2");
-      v = v.replace(/(\d{5})(\d)/, "$1-$2");
-    }
-    setPhone(v);
-  }
 
   async function pickImage() {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -99,7 +79,7 @@ export default function EditarPerfil() {
       quality: 0.7,
     });
 
-    if (!result.canceled && result.assets && result.assets[0]) {
+    if (!result.canceled && result.assets?.[0]) {
       setPhoto(result.assets[0].uri);
       showAlert("Foto selecionada!", "success");
     }
@@ -118,7 +98,7 @@ export default function EditarPerfil() {
       quality: 0.7,
     });
 
-    if (!result.canceled && result.assets && result.assets[0]) {
+    if (!result.canceled && result.assets?.[0]) {
       setPhoto(result.assets[0].uri);
       showAlert("Foto atualizada!", "success");
     }
@@ -130,12 +110,18 @@ export default function EditarPerfil() {
       return;
     }
 
-    await updateUser({
+    const updatedUser = {
+      ...user,
       name: name.trim(),
       email: email.trim(),
-      phone,
       photo,
-    });
+    };
+
+    // Atualiza no contexto global
+    await updateUser(updatedUser);
+
+    // Atualiza o armazenamento OFICIAL
+    await AsyncStorage.setItem("@user_data", JSON.stringify(updatedUser));
 
     showAlert("Perfil atualizado!", "success");
 
@@ -150,12 +136,11 @@ export default function EditarPerfil() {
     >
       <ScrollView
         contentContainerStyle={{ paddingBottom: 40 }}
-        keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-
-          {/* ALERTA PERSONALIZADO */}
+          {/* ALERTA */}
           <Animated.View
             style={[
               styles.alertBox,
@@ -208,16 +193,6 @@ export default function EditarPerfil() {
               placeholder="email@exemplo.com"
               style={styles.input}
             />
-
-            <Text style={styles.label}>Telefone</Text>
-            <TextInput
-              value={phone}
-              onChangeText={formatPhone}
-              keyboardType="numeric"
-              placeholder="(11) 99999-9999"
-              style={styles.input}
-              maxLength={15}
-            />
           </View>
 
           <TouchableOpacity style={styles.saveButton} onPress={salvar}>
@@ -227,7 +202,6 @@ export default function EditarPerfil() {
           <TouchableOpacity style={styles.cameraBtn} onPress={takePhoto}>
             <Text style={styles.cameraText}>Tirar foto com a câmera</Text>
           </TouchableOpacity>
-
         </Animated.View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -241,7 +215,6 @@ const styles = StyleSheet.create({
     padding: 26,
   },
 
-  /* ALERTA PERSONALIZADO */
   alertBox: {
     padding: 14,
     borderRadius: 12,
@@ -258,7 +231,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: "700",
     color: "#4C2E1E",
-    alignSelf: "center",
+    textAlign: "center",
     marginBottom: 20,
   },
 

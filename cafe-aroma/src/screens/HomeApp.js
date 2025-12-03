@@ -241,12 +241,12 @@ export default function HomeApp() {
       id: 'promo1',
       title: 'Cappuccino Tradicional',
       price: 12.90,
-      img: require('../../assets/cards/paes.png'),
+      img: require('../../assets/cards/cafe.png'),
       nav: {
         id: 1,
         nome: 'Cappuccino Tradicional',
         preco: 12.90,
-        imagem: require('../../assets/cards/paes.png'),
+        imagem: require('../../assets/cards/cafe.png'),
         descricao: "Um cappuccino clássico com equilíbrio perfeito entre café, leite e espuma.",
       }
     },
@@ -284,14 +284,14 @@ export default function HomeApp() {
       id: 'combo1',
       nome: 'Combo Café + Pão',
       preco: 18.90,
-      imagem: require('../../assets/cards/banner.png'),
+      imagem: require('../../assets/cards/combo1.png'),
       descricao: 'Cappuccino + Pão Caseiro',
     },
     {
       id: 'combo2',
       nome: 'Combo Doce',
       preco: 14.50,
-      imagem: require('../../assets/cards/combo.png'),
+      imagem: require('../../assets/cards/combo2.png'),
       descricao: 'Brownie + Suco Natural',
     },
   ];
@@ -300,15 +300,15 @@ export default function HomeApp() {
     {
       id: 'cesta1',
       nome: 'Cesta Família',
-      preco: 79.90,
-      imagem: require('../../assets/cards/paes.png'),
+      preco: 59.90,
+      imagem: require('../../assets/cards/cesta2.png'),
       descricao: 'Cestas com pães, geleias e bebidas.',
     },
     {
       id: 'cesta2',
       nome: 'Cesta Especial',
-      preco: 109.90,
-      imagem: require('../../assets/cards/combo.png'),
+      preco: 89.90,
+      imagem: require('../../assets/cards/cesta4.png'),
       descricao: 'Seleção premium para presentear.',
     },
   ];
@@ -522,9 +522,9 @@ export default function HomeApp() {
 
   /* ---------------------------- CARROSSEL BANNERS ---------------------------- */
   const banners = [
-    { id: 'b1', img: require('../../assets/cards/paes.png'), title: 'Unitários', section: 'unitarios' },
-    { id: 'b2', img: require('../../assets/cards/banner.png'), title: 'Combos', section: 'combos' },
-    { id: 'b3', img: require('../../assets/cards/combo.png'), title: 'Cestas', section: 'cestas' },
+    { id: 'b1', img: require('../../assets/cards/unitario.png'), title: 'Unitários', section: 'unitarios' },
+    { id: 'b2', img: require('../../assets/cards/combo3.png'), title: 'Combos', section: 'combos' },
+    { id: 'b3', img: require('../../assets/cards/cesta1.png'), title: 'Cestas', section: 'cestas' },
   ];
 
   function onBannerPress(section, index) {

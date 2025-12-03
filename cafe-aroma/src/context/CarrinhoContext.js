@@ -1,4 +1,4 @@
-import React, { createContext, useState, useMemo } from 'react';
+import React, { createContext, useState, useMemo, useContext } from 'react';
 
 export const CarrinhoContext = createContext();
 
@@ -8,8 +8,6 @@ export function CarrinhoProvider({ children }) {
 
   /* =====================================================
      ADICIONAR ITEM
-     - Garante que SEMPRE exista um ID único
-     - Se já existir no carrinho → aumenta quantidade
   ===================================================== */
   function adicionarItem(novoItem) {
 
@@ -32,7 +30,7 @@ export function CarrinhoProvider({ children }) {
   }
 
   /* =====================================================
-     REMOVER UM ITEM (reduz quantidade ou remove)
+     REMOVER UM ITEM
   ===================================================== */
   function removerItem(id) {
     setCarrinho(prev => {
@@ -88,4 +86,19 @@ export function CarrinhoProvider({ children }) {
       {children}
     </CarrinhoContext.Provider>
   );
+}
+
+/* =====================================================
+   🔥 HOOK CORRETO — ESSENCIAL PARA FUNCIONAR
+   Agora a tela de detalhes pode chamar:
+   const { adicionarItem } = useCarrinho();
+===================================================== */
+export function useCarrinho() {
+  const context = useContext(CarrinhoContext);
+
+  if (!context) {
+    throw new Error("useCarrinho deve ser usado dentro de um CarrinhoProvider");
+  }
+
+  return context;
 }

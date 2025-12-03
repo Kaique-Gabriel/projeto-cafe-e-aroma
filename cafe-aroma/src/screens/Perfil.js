@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -9,26 +9,10 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useUser } from "../context/UserContext";
-import { getUsuarioLogado } from "../utils/Auth"; // Use o getUsuarioLogado() para pegar o usuário atual
 
 export default function Perfil() {
   const navigation = useNavigation();
-  const { user, setUser } = useUser(); // Para sincronizar com o contexto
-  const [localUser, setLocalUser] = useState(null);
-
-  // Carrega usuário salvo no AsyncStorage ao iniciar a tela
-  useEffect(() => {
-    async function loadUser() {
-      const u = await getUsuarioLogado(); // Usando getUsuarioLogado
-      if (u) {
-        setLocalUser(u);
-        setUser(u); // Sincroniza com o contexto
-      }
-    }
-    loadUser();
-  }, []);
-
-  const displayUser = localUser || user;
+  const { user } = useUser();
 
   return (
     <ScrollView
@@ -36,30 +20,27 @@ export default function Perfil() {
       contentContainerStyle={{ paddingBottom: 40 }}
       showsVerticalScrollIndicator={false}
     >
-      {/* TÍTULO */}
       <Text style={styles.title}>Meu Perfil</Text>
 
-      {/* FOTO + DADOS */}
       <View style={styles.profileWrapper}>
         <Image
           source={
-            displayUser?.photo
-              ? { uri: displayUser.photo }
+            user?.photo
+              ? { uri: user.photo }
               : require("../../assets/images/profile/avatar-placeholder.png")
           }
           style={styles.profileImage}
         />
 
         <Text style={styles.profileName}>
-          {displayUser?.nome || displayUser?.name || "Usuário"}
+          {user?.nome || user?.name || "Usuário"}
         </Text>
 
         <Text style={styles.profileEmail}>
-          {displayUser?.email || "email@exemplo.com"}
+          {user?.email || "email@exemplo.com"}
         </Text>
       </View>
 
-      {/* OPÇÕES */}
       <View style={styles.optionsContainer}>
         <OptionItem
           icon={require("../../assets/images/icons/user.png")}
@@ -77,7 +58,6 @@ export default function Perfil() {
   );
 }
 
-/* COMPONENTE */
 function OptionItem({ icon, label, onPress }) {
   return (
     <TouchableOpacity style={styles.option} onPress={onPress}>
