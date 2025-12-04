@@ -442,89 +442,88 @@ export default function HomeApp() {
 
   /* ---------------------------- RENDER LARGE CARD (Combos/Cestas) ---------------------------- */
   const renderLargeCard = ({ item }) => {
-  const favorito = isFavorito(item.id);
+    const favorito = isFavorito(item.id);
 
-  return (
-    <View style={styles.largeCard}>
-      <ImageBackground
-        source={item.imagem}
-        style={styles.largeCardImage}
-        imageStyle={{ borderRadius: theme.radius.md }}
-      >
-        {/* Botão de favoritar */}
-        <TouchableOpacity
-          style={styles.favBtnLarge}
-          onPress={() => toggleFavorito(item)}
+    return (
+      <View style={styles.largeCard}>
+        <ImageBackground
+          source={item.imagem}
+          style={styles.largeCardImage}
+          imageStyle={{ borderRadius: theme.radius.md }}
         >
-          <Ionicons
-            name={favorito ? 'heart' : 'heart-outline'}
-            size={26}
-            color={favorito ? '#ff4271' : '#fff'}
-          />
-        </TouchableOpacity>
-
-        {/* Área principal clicável */}
-        <TouchableOpacity
-          activeOpacity={0.95}
-          style={styles.largeTouchableArea}
-          onPress={() => {
-            if (activeSection === 'combos') {
-              navigation.navigate('ComboDetalhes', { combo: item });
-            } else if (activeSection === 'cestas') {
-              navigation.navigate('CestaDetalhes', { cesta: item });
-            }
-          }}
-        >
-          <View style={styles.largeOverlay}>
-            <Text style={styles.largeTitle} numberOfLines={1}>
-              {item.nome}
-            </Text>
-
-            <Text style={styles.largeDesc} numberOfLines={2}>
-              {item.descricao}
-            </Text>
-          </View>
-        </TouchableOpacity>
-
-        {/* FOOTER — fora do Touchable principal! */}
-        <View style={styles.largeFooter}>
+          {/* Botão de favoritar */}
           <TouchableOpacity
-            onPress={() => {
-              if (activeSection === 'combos') {
-                navigation.navigate('ComboInfo', { combo: item });
-              } else {
-                navigation.navigate('CestaInfo', { cesta: item });
-              }
-            }}
-            style={styles.iconBtn}
+            style={styles.favBtnLarge}
+            onPress={() => toggleFavorito(item)}
           >
-            <Feather name="info" size={20} color="#fff" />
+            <Ionicons
+              name={favorito ? 'heart' : 'heart-outline'}
+              size={26}
+              color={favorito ? '#ff4271' : '#fff'}
+            />
           </TouchableOpacity>
 
-          <View style={styles.largeRight}>
-            <Text style={styles.largePrice}>
-              R$ {Number(item.preco).toFixed(2)}
-            </Text>
+          {/* Área principal clicável */}
+          <TouchableOpacity
+            activeOpacity={0.95}
+            style={styles.largeTouchableArea}
+            onPress={() => {
+              if (activeSection === 'combos') {
+                navigation.navigate('ComboDetalhes', { combo: item });
+              } else if (activeSection === 'cestas') {
+                navigation.navigate('CestaDetalhes', { cesta: item });
+              }
+            }}
+          >
+            <View style={styles.largeOverlay}>
+              <Text style={styles.largeTitle} numberOfLines={1}>
+                {item.nome}
+              </Text>
 
+              <Text style={styles.largeDesc} numberOfLines={2}>
+                {item.descricao}
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* FOOTER — fora do Touchable principal! */}
+          <View style={styles.largeFooter}>
             <TouchableOpacity
-              onPress={() => handleAddToCart(item)}
-              style={styles.largeAddBtn}
+              onPress={() => {
+                if (activeSection === 'combos') {
+                  navigation.navigate('ComboInfo', { combo: item });
+                } else {
+                  navigation.navigate('CestaInfo', { cesta: item });
+                }
+              }}
+              style={styles.iconBtn}
             >
-              <MaterialCommunityIcons name="cart-plus" size={20} color="#fff" />
+              <Feather name="info" size={20} color="#fff" />
             </TouchableOpacity>
-          </View>
-        </View>
-      </ImageBackground>
-    </View>
-  );
-};
 
+            <View style={styles.largeRight}>
+              <Text style={styles.largePrice}>
+                R$ {Number(item.preco).toFixed(2)}
+              </Text>
+
+              <TouchableOpacity
+                onPress={() => handleAddToCart(item)}
+                style={styles.largeAddBtn}
+              >
+                <MaterialCommunityIcons name="cart-plus" size={20} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ImageBackground>
+      </View>
+    );
+  };
 
   /* ---------------------------- CARROSSEL BANNERS ---------------------------- */
   const banners = [
-    { id: 'b1', img: require('../../assets/cards/unitario.png'), title: 'Unitários', section: 'unitarios' },
-    { id: 'b2', img: require('../../assets/cards/combo3.png'), title: 'Combos', section: 'combos' },
-    { id: 'b3', img: require('../../assets/cards/cesta1.png'), title: 'Cestas', section: 'cestas' },
+    { id: 'b1', img: require('../../assets/cards/unitario.png'), section: 'unitarios', title: 'Unitários' },
+    { id: 'b2', img: require('../../assets/cards/combo3.png'), section: 'combos', title: 'Combos' },
+    { id: 'b3', img: require('../../assets/cards/cesta1.png'), section: 'cestas', title: 'Cestas' },
   ];
 
   function onBannerPress(section, index) {
@@ -543,10 +542,64 @@ export default function HomeApp() {
     setActiveSection(section);
   }
 
+  /* ---------------------------- NOVA FUNÇÃO: sincroniza tab -> carrossel -> conteúdo ---------------------------- */
+  function goToSection(sectionName) {
+    const index = banners.findIndex(b => b.section === sectionName);
+    if (index === -1) {
+      setActiveSection(sectionName); // fallback
+      return;
+    }
+
+    setActiveSection(sectionName);
+
+    if (carouselRef.current && typeof carouselRef.current.scrollToIndex === 'function') {
+      carouselRef.current.scrollToIndex({ index, animated: true });
+    }
+  }
+
+  /* ---------------------------- TOAST/ALERT ESTILIZADO (Café & Aroma) ---------------------------- */
+  const toastAnim = useRef(new Animated.Value(0)).current;
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastVisible, setToastVisible] = useState(false);
+
+  function showToast(message = '', duration = 1800) {
+    setToastMsg(message);
+    setToastVisible(true);
+    Animated.timing(toastAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+
+    setTimeout(() => {
+      Animated.timing(toastAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => setToastVisible(false));
+    }, duration);
+  }
+
   /* ---------------------------- MAIN ---------------------------- */
   return (
     <View style={[styles.container, { paddingBottom: 5 }]}>
       <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+
+      {/* TOAST */}
+      {toastVisible && (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.toast,
+            {
+              opacity: toastAnim,
+              transform: [{ translateY: toastAnim.interpolate({ inputRange: [0, 1], outputRange: [-18, 0] }) }],
+            },
+          ]}
+        >
+          <Text style={styles.toastText}>{toastMsg}</Text>
+        </Animated.View>
+      )}
 
       {/* HEADER */}
       <View style={styles.header}>
@@ -627,13 +680,13 @@ export default function HomeApp() {
 
       {/* TAB BAR */}
       <View style={styles.tabBar}>
-        <TouchableOpacity style={[styles.tabItem, activeSection === 'unitarios' && styles.tabActive]} onPress={() => setActiveSection('unitarios')}>
+        <TouchableOpacity style={[styles.tabItem, activeSection === 'unitarios' && styles.tabActive]} onPress={() => goToSection('unitarios')}>
           <Text style={[styles.tabText, activeSection === 'unitarios' && styles.tabTextActive]}>Unitários</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.tabItem, activeSection === 'combos' && styles.tabActive]} onPress={() => setActiveSection('combos')}>
+        <TouchableOpacity style={[styles.tabItem, activeSection === 'combos' && styles.tabActive]} onPress={() => goToSection('combos')}>
           <Text style={[styles.tabText, activeSection === 'combos' && styles.tabTextActive]}>Combos</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.tabItem, activeSection === 'cestas' && styles.tabActive]} onPress={() => setActiveSection('cestas')}>
+        <TouchableOpacity style={[styles.tabItem, activeSection === 'cestas' && styles.tabActive]} onPress={() => goToSection('cestas')}>
           <Text style={[styles.tabText, activeSection === 'cestas' && styles.tabTextActive]}>Cestas</Text>
         </TouchableOpacity>
       </View>
@@ -698,6 +751,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+  },
+
+  /* TOAST */
+  toast: {
+    position: 'absolute',
+    top: StatusBar.currentHeight ? StatusBar.currentHeight + 8 : 12,
+    left: 20,
+    right: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    backgroundColor: '#4E342E',
+    borderRadius: 12,
+    zIndex: 9999,
+    elevation: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+  },
+  toastText: {
+    color: '#FFF',
+    fontWeight: '700',
+    fontSize: 14,
   },
 
   header: {

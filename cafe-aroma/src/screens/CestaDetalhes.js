@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,10 +6,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Alert,
+  Modal,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useCarrinho } from "../context/CarrinhoContext";
+import { Feather } from "@expo/vector-icons";
 
 export default function CestaDetalhes() {
   const navigation = useNavigation();
@@ -18,11 +19,11 @@ export default function CestaDetalhes() {
 
   const { cesta } = route.params || {};
 
+  // ALERTA ELEGANTE — mesmo estilo do DetalhesPedido.js
+  const [alertVisible, setAlertVisible] = useState(false);
+
   function handleAddToCart() {
-    if (!cesta) {
-      Alert.alert("Erro", "Item inválido.");
-      return;
-    }
+    if (!cesta) return;
 
     adicionarItem({
       id: cesta.id,
@@ -34,7 +35,7 @@ export default function CestaDetalhes() {
       tipo: "cesta",
     });
 
-    navigation.navigate("MainApp", { screen: "Carrinho" });
+    setAlertVisible(true);
   }
 
   if (!cesta) {
@@ -46,37 +47,60 @@ export default function CestaDetalhes() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <Image source={cesta.imagem} style={styles.imagem} />
+    <>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Image source={cesta.imagem} style={styles.imagem} />
 
-      <View style={styles.card}>
-        <Text style={styles.nome}>{cesta.nome}</Text>
-        <Text style={styles.preco}>R$ {cesta.preco.toFixed(2)}</Text>
+        <View style={styles.card}>
+          <Text style={styles.nome}>{cesta.nome}</Text>
+          <Text style={styles.preco}>R$ {cesta.preco.toFixed(2)}</Text>
 
-        <Text style={styles.tituloSecao}>Descrição</Text>
-        <Text style={styles.descricao}>{cesta.descricao}</Text>
+          <Text style={styles.tituloSecao}>Descrição</Text>
+          <Text style={styles.descricao}>{cesta.descricao}</Text>
 
-        {/* BOTÃO DE MAIS INFORMAÇÕES */}
-        <TouchableOpacity
-          style={styles.botaoInfo}
-          onPress={() => navigation.navigate("CestaInfo", { cesta })}
-        >
-          <Text style={styles.botaoTexto}>Mais Informações</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.botaoInfo}
+            onPress={() => navigation.navigate("CestaInfo", { cesta })}
+          >
+            <Text style={styles.botaoTexto}>Mais Informações</Text>
+          </TouchableOpacity>
 
-        {/* BOTÃO DE ADICIONAR AO CARRINHO */}
-        <TouchableOpacity style={styles.botaoCarrinho} onPress={handleAddToCart}>
-          <Text style={styles.botaoTexto}>Adicionar ao Carrinho</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+          <TouchableOpacity style={styles.botaoCarrinho} onPress={handleAddToCart}>
+            <Text style={styles.botaoTexto}>Adicionar ao Carrinho</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+
+      {/* ------------------ ALERTA ELEGANTE ------------------ */}
+      <Modal visible={alertVisible} transparent animationType="fade">
+        <View style={styles.alertBackground}>
+          <View style={styles.alertBox}>
+            <Feather name="check-circle" size={40} color="#8C4A2F" />
+
+            <Text style={styles.alertTitle}>Adicionado!</Text>
+
+            <Text style={styles.alertText}>
+              {cesta.nome} foi adicionado ao carrinho com sucesso.
+            </Text>
+
+            <TouchableOpacity
+              style={styles.alertButton}
+              onPress={() => {
+                setAlertVisible(false);
+              }}
+            >
+              <Text style={styles.alertButtonText}>Entendi</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      {/* -------------------------------------------------------- */}
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    padding: 20,
-  },
+  scrollContainer: { padding: 20 },
   imagem: {
     width: "100%",
     height: 230,
@@ -126,19 +150,49 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
   },
-  botaoTexto: {
-    color: "#FFF",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  errorContainer: {
+  botaoTexto: { color: "#FFF", fontSize: 18, fontWeight: "bold" },
+
+  /* ----- ALERTA ELEGANTE (igual ao DetalhesPedido.js) ----- */
+  alertBackground: {
     flex: 1,
+    backgroundColor: "rgba(0,0,0,0.45)",
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
   },
-  errorText: {
-    fontSize: 18,
-    color: "#4E342E",
+  alertBox: {
+    width: "80%",
+    backgroundColor: "#FFF4EB",
+    borderRadius: 18,
+    padding: 24,
+    alignItems: "center",
+    borderWidth: 1.5,
+    borderColor: "#D5B9A2",
   },
+  alertTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#4C2E1E",
+    marginTop: 10,
+  },
+  alertText: {
+    fontSize: 16,
+    color: "#6A4A3C",
+    textAlign: "center",
+    marginVertical: 10,
+  },
+  alertButton: {
+    backgroundColor: "#6A4A3C",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  alertButtonText: {
+    color: "#FFF",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+
+  errorContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+  errorText: { fontSize: 18, color: "#4E342E" },
 });

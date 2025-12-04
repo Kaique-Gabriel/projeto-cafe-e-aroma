@@ -1,6 +1,6 @@
-// ---------------- DetalhesPedido.js (VERSÃO ATUALIZADA E MELHORADA) ----------------
+// ---------------- DetalhesPedido.js (COM ALERTA ELEGANTE INTEGRADO) ----------------
 
-import React from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -9,18 +9,20 @@ import {
   ScrollView,
   TouchableOpacity,
   Animated,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
-import { useContext, useRef } from 'react';
 import { CarrinhoContext } from '../context/CarrinhoContext';
 
 export default function DetalhesPedido({ route, navigation }) {
   const { id, nome, preco, imagem } = route.params;
-
   const { adicionarItem } = useContext(CarrinhoContext);
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  // 🔔 ALERTA ELEGANTE AQUI
+  const [alertVisible, setAlertVisible] = useState(false);
 
   function animateButton() {
     Animated.sequence([
@@ -39,36 +41,31 @@ export default function DetalhesPedido({ route, navigation }) {
       imagem,
     });
 
-    alert("Produto adicionado ao carrinho!");
+    // ➜ Ativa o alerta elegante
+    setAlertVisible(true);
   }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF8F0' }}>
       
-      {/* -------- HEADER -------- */}
- 
+      <ScrollView 
+        showsVerticalScrollIndicator={false} 
+        style={styles.container}
+        contentContainerStyle={{ paddingBottom: 40 }}
+      >
 
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.container}
-        contentContainerStyle={{ paddingBottom: 40 }} // EVITA NAVBAR COMER A UI
->
-
-        {/* -------- IMAGEM DO PRODUTO -------- */}
         <Image source={imagem} style={styles.image} />
 
-        {/* -------- NOME -------- */}
         <Text style={styles.title}>{nome}</Text>
 
-        {/* -------- PREÇO -------- */}
         <Text style={styles.price}>R$ {Number(preco).toFixed(2)}</Text>
 
-        {/* -------- DESCRIÇÃO TEMPORÁRIA -------- */}
         <Text style={styles.sectionTitle}>Descrição</Text>
         <Text style={styles.description}>
           Produto artesanal selecionado com carinho para garantir a melhor experiência.
           Ideal para acompanhar seu café da manhã ou café da tarde.
         </Text>
 
-        {/* -------- BOTÃO ADICIONAR AO CARRINHO -------- */}
         <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
           <TouchableOpacity style={styles.button} onPress={handleAddToCart}>
             <Feather name="shopping-cart" size={20} color="#fff" style={{ marginRight: 8 }} />
@@ -77,6 +74,28 @@ export default function DetalhesPedido({ route, navigation }) {
         </Animated.View>
 
       </ScrollView>
+
+      {/* ---------------- MODAL DE ALERTA ELEGANTE ---------------- */}
+      <Modal visible={alertVisible} transparent animationType="fade">
+        <View style={styles.alertBackground}>
+          <View style={styles.alertBox}>
+            <Feather name="check-circle" size={40} color="#8C4A2F" />
+            <Text style={styles.alertTitle}>Adicionado!</Text>
+            <Text style={styles.alertText}>
+              {nome} foi adicionado ao carrinho com sucesso.
+            </Text>
+
+            <TouchableOpacity
+              style={styles.alertButton}
+              onPress={() => setAlertVisible(false)}
+            >
+              <Text style={styles.alertButtonText}>Entendi</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      {/* ----------------------------------------------------------- */}
+
     </SafeAreaView>
   );
 }
@@ -85,23 +104,6 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 18,
     paddingTop: 10,
-  },
-
-  /* Header */
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-  },
-  backBtn: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#4A2C2A',
-    marginLeft: 10,
   },
 
   image: {
@@ -150,5 +152,46 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 17,
     fontWeight: '700',
+  },
+
+  /* ALERTA ELEGANTE */
+  alertBackground: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  alertBox: {
+    width: "80%",
+    backgroundColor: "#FFF4EB",
+    borderRadius: 18,
+    padding: 24,
+    alignItems: "center",
+    borderWidth: 1.5,
+    borderColor: "#D5B9A2",
+  },
+  alertTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#4C2E1E",
+    marginTop: 10,
+  },
+  alertText: {
+    fontSize: 16,
+    color: "#6A4A3C",
+    textAlign: "center",
+    marginVertical: 10,
+  },
+  alertButton: {
+    backgroundColor: "#6A4A3C",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  alertButtonText: {
+    color: "#FFF",
+    fontSize: 15,
+    fontWeight: "700",
   },
 });
