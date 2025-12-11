@@ -16,7 +16,7 @@ import {
 
 export default function MetodoPagamento({ navigation, route }) {
 
-  // 🔥 RECEBENDO OS DADOS DO CARRINHO
+  // recebe os dados do carrinho
   const itens = route?.params?.itens ?? [];
   const valorTotal = Number(route?.params?.valorTotal ?? 0);
   const quantidadeTotal = route?.params?.quantidadeTotal ?? 0;
@@ -49,12 +49,11 @@ export default function MetodoPagamento({ navigation, route }) {
   function continuar() {
     if (!selecionado) return;
 
-    // ✅ AGORA O MÉTODO DE PAGAMENTO ESTÁ SENDO ENVIADO!
     const params = {
       itens,
       valorTotal,
       quantidadeTotal,
-      pagamento: selecionado, // ← ESSENCIAL
+      pagamento: selecionado, // <- necessario
     };
 
     if (selecionado === "pix")

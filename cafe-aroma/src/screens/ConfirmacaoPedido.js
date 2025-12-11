@@ -13,12 +13,10 @@ import { CarrinhoContext } from "../context/CarrinhoContext";
 
 export default function ConfirmacaoPedido({ navigation, route }) {
 
-  // ✅ RECEBENDO TODOS OS DADOS
   const endereco = route?.params?.endereco ?? {};
   const itens = route?.params?.itens ?? [];
   const valorTotal = route?.params?.valorTotal ?? 0;
 
-  // 🔥 CORREÇÃO AQUI — agora pega o que realmente foi enviado
   const metodoPagamento = route?.params?.pagamento ?? "Não informado";
 
   const { adicionarPedido } = useContext(PedidosContext);

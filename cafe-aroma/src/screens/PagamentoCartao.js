@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 export default function PagamentoCartao({ navigation, route }) {
 
-  // 🔥 Agora pegamos TUDO que veio do carrinho → MetodoPagamento → aqui
+  // recebe tudo que veio do carrinho → MetodoPagamento → aqui
   const itens = route?.params?.itens ?? [];
   const valorTotal = route?.params?.valorTotal ?? 0;
   const quantidadeTotal = route?.params?.quantidadeTotal ?? 0;
@@ -17,7 +17,7 @@ export default function PagamentoCartao({ navigation, route }) {
 
   function handleContinuar() {
 
-    // 🔥 ENVIANDO TODOS OS DADOS NECESSÁRIOS → EnderecoEntrega
+    // envia os dados para → EnderecoEntrega
     navigation.navigate("EnderecoEntrega", {
       itens,
       valorTotal,

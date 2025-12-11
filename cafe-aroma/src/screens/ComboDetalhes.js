@@ -20,7 +20,7 @@ export default function ComboDetalhes() {
 
   const { combo } = route.params || {};
 
-  // ALERT ELEGANTE (MESMO DO DetalhesPedido.js)
+  // alert personalizado
   const [alertVisible, setAlertVisible] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -91,7 +91,7 @@ export default function ComboDetalhes() {
         </View>
       </ScrollView>
 
-      {/* ALERTA IDÊNTICO AO DO DetalhesPedido.js */}
+      {/* alert personalizado */}
       <Modal transparent visible={alertVisible} animationType="fade">
         <View style={styles.alertBackground}>
           <Animated.View style={[styles.alertBox, { opacity: fadeAnim }]}>
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
-  /* --- ALERTA IGUAL AO DO DetalhesPedido.js --- */
+  /* --- parte do alert personalizado --- */
   alertBackground: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.45)",

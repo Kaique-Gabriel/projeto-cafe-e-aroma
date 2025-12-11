@@ -14,7 +14,6 @@ export default function Carrinho({ navigation }) {
     total
   } = useContext(CarrinhoContext);
 
-  // 🚀 AGORA ENVIAMOS TUDO DE FORMA COMPLETA
   function irParaMetodoPagamento() {
     if (carrinho.length === 0) return;
 

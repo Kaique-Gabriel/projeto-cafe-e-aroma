@@ -8,21 +8,6 @@ export function PedidosProvider({ children }) {
   const [pedidos, setPedidos] = useState([]);        // pedidos em andamento
   const [historico, setHistorico] = useState([]);    // pedidos entregues
 
-  /**
-   * novoPedido deve vir do Carrinho.js com a estrutura:
-   * {
-   *   id: number,
-   *   total: number,
-   *   itens: [...],
-   *   endereco: {
-   *     rua,
-   *     bairro,
-   *     numero,
-   *     complemento,
-   *     referencia
-   *   }
-   * }
-   */
   function adicionarPedido(novoPedido) {
     setPedidos(prev => [...prev, novoPedido]);
   }

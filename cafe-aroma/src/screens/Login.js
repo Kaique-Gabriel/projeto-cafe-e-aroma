@@ -62,7 +62,7 @@ export default function Login({ navigation }) {
     }).start();
   };
 
-  // VALIDAÇÃO com async/await usando loginUsuario do Auth.js
+  // validação com async/await usando loginUsuario do Auth.js
   const validarLogin = async () => {
     setError('');
 
@@ -78,7 +78,7 @@ export default function Login({ navigation }) {
     try {
       const res = await loginUsuario(email.trim(), password);
       if (!res.ok) {
-        // res.msg vem do Auth.js (ex: "Email não encontrado." / "Senha incorreta.")
+        // mensagem do Auth.js caso invalido (ex: "Email não encontrado." / "Senha incorreta.")
         return mostrarErro(res.msg || 'Erro ao logar.');
       }
 

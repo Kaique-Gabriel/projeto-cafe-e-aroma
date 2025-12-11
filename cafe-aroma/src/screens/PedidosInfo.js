@@ -6,11 +6,11 @@ import theme from '../theme/theme';
 export default function PedidosInfo({ route }) {
   const { item } = route.params;
 
-  const info = item.info || {}; // ← GARANTE QUE SEMPRE EXISTE
+  const info = item.info || {}; // ← garante que funcione mesmo com erro
 
   return (
     <ScrollView style={styles.container}
-      contentContainerStyle={{ paddingBottom: 40 }} // EVITA NAVBAR COMER A UI
+      contentContainerStyle={{ paddingBottom: 40 }} // evita que NAVBAR "come" a UI
 >
       {item.imagem && (
         <Image source={item.imagem} style={styles.image} />

@@ -1,4 +1,4 @@
-// ---------------- DetalhesPedido.js (COM ALERTA ELEGANTE INTEGRADO) ----------------
+// ---------------- DetalhesPedido.js ----------------
 
 import React, { useContext, useRef, useState } from 'react';
 import {
@@ -21,7 +21,7 @@ export default function DetalhesPedido({ route, navigation }) {
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
-  // 🔔 ALERTA ELEGANTE AQUI
+  // alerta personalizado aqui
   const [alertVisible, setAlertVisible] = useState(false);
 
   function animateButton() {
@@ -41,7 +41,7 @@ export default function DetalhesPedido({ route, navigation }) {
       imagem,
     });
 
-    // ➜ Ativa o alerta elegante
+    // ➜ Ativa o alerta personalizado
     setAlertVisible(true);
   }
 
@@ -75,7 +75,7 @@ export default function DetalhesPedido({ route, navigation }) {
 
       </ScrollView>
 
-      {/* ---------------- MODAL DE ALERTA ELEGANTE ---------------- */}
+      {/* ---------------- alerta personalizado ---------------- */}
       <Modal visible={alertVisible} transparent animationType="fade">
         <View style={styles.alertBackground}>
           <View style={styles.alertBox}>

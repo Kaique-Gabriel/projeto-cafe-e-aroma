@@ -5,14 +5,14 @@ import { Ionicons } from "@expo/vector-icons";
 
 export default function PagamentoPix({ navigation, route }) {
 
-  // 🔥 Recebendo os dados vindos do MetodoPagamento
+  // recebe os dados vindos do MetodoPagamento
   const itens = route?.params?.itens ?? [];
   const valorTotal = route?.params?.valorTotal ?? 0;
   const quantidadeTotal = route?.params?.quantidadeTotal ?? 0;
 
   const handleContinuar = () => {
 
-    // 🔥 ENVIANDO OS DADOS COMPLETOS PARA O ENDEREÇO
+    // envia os dados para o endereço
     navigation.navigate("EnderecoEntrega", {
       itens,
       valorTotal,

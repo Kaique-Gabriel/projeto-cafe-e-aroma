@@ -18,7 +18,7 @@ export default function Codigo2FA({ navigation }) {
   const codigoFixo = "123456";
   const [codigo, setCodigo] = useState("");
 
-  // estados do ALERT customizado
+  // estados do alert customizado
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
@@ -53,7 +53,7 @@ export default function Codigo2FA({ navigation }) {
 
   return (
     <>
-      {/* ALERT MODERNO E PERSONALIZADO */}
+      {/* alert personalizado */}
       <Modal transparent visible={alertVisible} animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.alertBox}>
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     marginTop: 15 
   },
 
-  /* ALERT PERSONALIZADO — Café & Aroma */
+  /* alert personalizado — Café & Aroma */
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.4)",

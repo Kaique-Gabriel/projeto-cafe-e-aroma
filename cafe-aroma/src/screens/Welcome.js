@@ -22,7 +22,7 @@ export default function Welcome({ navigation }) {
 
       {/* ILUSTRAÇÃO (PODE TROCAR DEPOIS) */}
 
-      {/* BOTÃO ENTRAR */}
+      {/* botão de login */}
       <TouchableOpacity
         style={styles.btnPrimary}
         onPress={() => navigation.navigate('Login')}
@@ -31,7 +31,7 @@ export default function Welcome({ navigation }) {
         <Text style={styles.btnPrimaryText}>Entrar</Text>
       </TouchableOpacity>
 
-      {/* BOTÃO CADASTRAR */}
+      {/* botão de se cadastrar */}
       <TouchableOpacity
         style={styles.btnSecondary}
         onPress={() => navigation.navigate('Cadastro')}

@@ -89,9 +89,7 @@ export function CarrinhoProvider({ children }) {
 }
 
 /* =====================================================
-   🔥 HOOK CORRETO — ESSENCIAL PARA FUNCIONAR
-   Agora a tela de detalhes pode chamar:
-   const { adicionarItem } = useCarrinho();
+  hook necessario para as telas funcionarem.
 ===================================================== */
 export function useCarrinho() {
   const context = useContext(CarrinhoContext);

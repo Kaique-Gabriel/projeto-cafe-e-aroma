@@ -3,7 +3,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /* -------------------------------------------
-   🔥 BUSCA A LISTA COMPLETA DE USUÁRIOS
+ busca a lista completa de usuarios
 ------------------------------------------- */
 export async function getUsuarios() {
   const data = await AsyncStorage.getItem('@usuarios');
@@ -11,14 +11,14 @@ export async function getUsuarios() {
 }
 
 /* -------------------------------------------
-   🔥 SALVA A LISTA COMPLETA DE USUÁRIOS
+ salva a lista completa de usuarios
 ------------------------------------------- */
 async function salvarUsuarios(lista) {
   await AsyncStorage.setItem('@usuarios', JSON.stringify(lista));
 }
 
 /* -------------------------------------------
-   🔥 CADASTRAR USUÁRIO (AGORA MULTI-USUÁRIO)
+  cadastra multiplos usuarios
 ------------------------------------------- */
 export async function cadastrarUsuario(nome, email, senha) {
   const usuarios = await getUsuarios();
@@ -43,7 +43,7 @@ export async function cadastrarUsuario(nome, email, senha) {
 }
 
 /* -------------------------------------------
-   🔥 BUSCAR USUÁRIO POR EMAIL
+   busca usuario por email
 ------------------------------------------- */
 export async function getUsuarioPorEmail(email) {
   const usuarios = await getUsuarios();
@@ -51,7 +51,7 @@ export async function getUsuarioPorEmail(email) {
 }
 
 /* -------------------------------------------
-   🔥 LOGIN MULTI-USUÁRIO
+   ligin de multiplos usuarios
 ------------------------------------------- */
 export async function loginUsuario(email, senha) {
   const usuarios = await getUsuarios();
@@ -77,7 +77,7 @@ export async function loginUsuario(email, senha) {
 }
 
 /* -------------------------------------------
-   🔥 PEGAR USUÁRIO ATUAL
+   pega o usuario atual
 ------------------------------------------- */
 export async function setUsuarioLogado(user) {
   await AsyncStorage.setItem('@usuario_logado', JSON.stringify(user));

@@ -19,7 +19,7 @@ export default function CestaDetalhes() {
 
   const { cesta } = route.params || {};
 
-  // ALERTA ELEGANTE — mesmo estilo do DetalhesPedido.js
+  // alerta personalizado
   const [alertVisible, setAlertVisible] = useState(false);
 
   function handleAddToCart() {
@@ -71,7 +71,7 @@ export default function CestaDetalhes() {
         </View>
       </ScrollView>
 
-      {/* ------------------ ALERTA ELEGANTE ------------------ */}
+      {/* ------------------ alerta personalizado ------------------ */}
       <Modal visible={alertVisible} transparent animationType="fade">
         <View style={styles.alertBackground}>
           <View style={styles.alertBox}>
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   },
   botaoTexto: { color: "#FFF", fontSize: 18, fontWeight: "bold" },
 
-  /* ----- ALERTA ELEGANTE (igual ao DetalhesPedido.js) ----- */
+  /* ----- alerta personalizado ----- */
   alertBackground: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.45)",

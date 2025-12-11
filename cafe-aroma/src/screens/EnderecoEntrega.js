@@ -11,7 +11,6 @@ import {
 
 export default function EnderecoEntrega({ navigation, route }) {
 
-  // --- AGORA LER OS PARAMS CERTOS ---
   const itens = route?.params?.itens ?? [];
   const valorTotal = route?.params?.valorTotal ?? 0;
   const quantidadeTotal = route?.params?.quantidadeTotal ?? 0;
